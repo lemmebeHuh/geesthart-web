@@ -12,7 +12,7 @@ export const sanityClient = isSanityConfigured
       projectId,
       dataset,
       apiVersion,
-      useCdn: true,
+      useCdn: false, // Set to false to avoid stale edge cache after adding/editing products
     })
   : null;
 

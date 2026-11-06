@@ -67,7 +67,7 @@ export default function StudioPage() {
 
   const fetchAnalytics = () => {
     setAnalyticsLoading(true);
-    fetch('/api/analytics')
+    fetch(`/api/analytics?t=${Date.now()}`, { cache: 'no-store' })
       .then((res) => res.json())
       .then((data) => setAnalytics(data))
       .catch(() => {})
@@ -75,7 +75,7 @@ export default function StudioPage() {
   };
 
   useEffect(() => {
-    fetch('/api/cms/products')
+    fetch(`/api/cms/products?t=${Date.now()}`, { cache: 'no-store' })
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data.products) && data.products.length > 0) {

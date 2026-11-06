@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@sanity/client';
 import { AnalyticsEvent, AnalyticsSummary } from '@/types/analytics';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 const SANITY_PROJECT_ID =
   process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'a2ie5vo6';
 const SANITY_DATASET = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production';
@@ -50,11 +53,17 @@ export async function GET() {
         referrers,
         popularPages,
         popularProducts
-      }`
+      }`,
+      {},
+      { cache: 'no-store' }
     );
 
     if (!doc) {
-      return NextResponse.json(DEFAULT_SUMMARY);
+      return NextResponse.json(DEFAULT_SUMMARY, {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate',
+        },
+      });
     }
 
     const todayStr = new Date().toISOString().slice(0, 10);
@@ -63,11 +72,15 @@ export async function GET() {
 
     const summary: AnalyticsSummary = {
       totalPageViews: doc.totalPageViews || 0,
-      uniqueVisitors: doc.uniqueVisitors || Math.max(1, Math.round((doc.totalPageViews || 0) * 0.7)),
+      uniqueVisitors:
+        doc.uniqueVisitors ||
+        Math.max(1, Math.round((doc.totalPageViews || 0) * 0.75)),
       todayViews,
       referrers: Array.isArray(doc.referrers) ? doc.referrers : [],
       popularPages: Array.isArray(doc.popularPages) ? doc.popularPages : [],
-      popularProducts: Array.isArray(doc.popularProducts) ? doc.popularProducts : [],
+      popularProducts: Array.isArray(doc.popularProducts)
+        ? doc.popularProducts
+        : [],
       storeClicks: [
         { platform: 'Shopee', clicks: doc.shopeeClicks || 0 },
         { platform: 'WhatsApp', clicks: doc.whatsappClicks || 0 },
@@ -76,7 +89,11 @@ export async function GET() {
       ],
     };
 
-    return NextResponse.json(summary);
+    return NextResponse.json(summary, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate',
+      },
+    });
   } catch (error) {
     console.error('Failed to fetch analytics from Sanity:', error);
     return NextResponse.json(DEFAULT_SUMMARY);
@@ -89,7 +106,7 @@ export async function POST(request: Request) {
     const client = getSanityClient();
     const todayStr = new Date().toISOString().slice(0, 10);
 
-    // Ensure document exists
+    // 1. Ensure initial document exists with all counters
     await client.createIfNotExists({
       _id: 'geesthart_analytics',
       _type: 'siteAnalytics',
@@ -109,6 +126,14 @@ export async function POST(request: Request) {
     if (event.type === 'pageview') {
       const patch = client
         .patch('geesthart_analytics')
+        .setIfMissing({
+          todayViews: 0,
+          totalPageViews: 0,
+          uniqueVisitors: 0,
+          referrers: [],
+          popularPages: [],
+          popularProducts: [],
+        })
         .inc({ totalPageViews: 1, todayViews: 1 })
         .set({ lastUpdatedDate: todayStr });
 
@@ -123,6 +148,12 @@ export async function POST(request: Request) {
       if (fieldToInc) {
         await client
           .patch('geesthart_analytics')
+          .setIfMissing({
+            shopeeClicks: 0,
+            whatsappClicks: 0,
+            tiktokClicks: 0,
+            tokopediaClicks: 0,
+          })
           .inc({ [fieldToInc]: 1 })
           .commit();
       }
@@ -131,6 +162,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true });
   } catch (error: any) {
     console.error('Failed to update analytics event:', error);
-    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { ok: false, error: error.message },
+      { status: 500 }
+    );
   }
 }

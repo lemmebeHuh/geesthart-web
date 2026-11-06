@@ -6,6 +6,9 @@ import { ArrowUpRight, MapPin, Layers } from 'lucide-react';
 import { getLookbooks, getProducts } from '@/lib/data';
 import { formatRupiah } from '@/lib/format';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: 'Lookbook Koleksi — Forest, City & Court',
   description:

@@ -5,6 +5,9 @@ import { getProducts, writeLocalCmsProducts } from '@/lib/data';
 import { INITIAL_PRODUCTS } from '@/data/seed-data';
 import { Product } from '@/types/geesthart';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 const SANITY_PROJECT_ID =
   process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'a2ie5vo6';
 const SANITY_DATASET = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production';
@@ -14,11 +17,18 @@ const SANITY_WRITE_TOKEN =
 
 export async function GET() {
   const products = await getProducts();
-  return NextResponse.json({
-    products,
-    sanityProjectId: SANITY_PROJECT_ID,
-    sanityDataset: SANITY_DATASET,
-  });
+  return NextResponse.json(
+    {
+      products,
+      sanityProjectId: SANITY_PROJECT_ID,
+      sanityDataset: SANITY_DATASET,
+    },
+    {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate',
+      },
+    }
+  );
 }
 
 export async function PUT(request: Request) {

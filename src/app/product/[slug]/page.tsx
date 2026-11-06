@@ -7,6 +7,9 @@ import { ProductDetailClient } from '@/components/ProductDetailClient';
 import { ProductCard } from '@/components/ProductCard';
 import { formatRupiah } from '@/lib/format';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 interface ProductPageProps {
   params: Promise<{ slug: string }>;
 }

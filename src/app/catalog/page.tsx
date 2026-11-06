@@ -3,6 +3,9 @@ import { Metadata } from 'next';
 import { getProducts } from '@/lib/data';
 import { CatalogClient } from '@/components/CatalogClient';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: 'Katalog Produk & Size Chart',
   description:

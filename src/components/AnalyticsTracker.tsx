@@ -8,8 +8,8 @@ export function AnalyticsTracker() {
   const lastPath = useRef<string>('');
 
   useEffect(() => {
-    // Avoid double logging on initial mount or identical paths
-    if (pathname && pathname !== lastPath.current) {
+    // Avoid double logging on initial mount or identical paths, and don't count owner studio visits
+    if (pathname && pathname !== lastPath.current && !pathname.startsWith('/studio') && !pathname.startsWith('/api')) {
       lastPath.current = pathname;
 
       try {
@@ -20,6 +20,8 @@ export function AnalyticsTracker() {
         fetch('/api/analytics', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          keepalive: true,
+          cache: 'no-store',
           body: JSON.stringify({
             type: 'pageview',
             path: pathname,
@@ -42,6 +44,8 @@ export function trackStoreClick(platform: 'Shopee' | 'WhatsApp' | 'TikTok Shop' 
     fetch('/api/analytics', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      keepalive: true,
+      cache: 'no-store',
       body: JSON.stringify({
         type: 'click_store',
         path: typeof window !== 'undefined' ? window.location.pathname : '',

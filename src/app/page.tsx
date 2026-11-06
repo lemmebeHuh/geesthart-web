@@ -15,6 +15,9 @@ import { ProductCard } from '@/components/ProductCard';
 import { getLookbooks, getProducts } from '@/lib/data';
 import { SITE_CONFIG } from '@/data/seed-data';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function HomePage() {
   const products = await getProducts();
   const lookbooks = await getLookbooks();
