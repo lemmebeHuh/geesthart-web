@@ -6,6 +6,7 @@ import { X, ArrowUpRight, MessageCircle, ShoppingBag, ShieldCheck, Sparkles } fr
 import { Product } from '@/types/geesthart';
 import { buildWhatsAppOrderUrl, formatRupiah } from '@/lib/format';
 import { SITE_CONFIG } from '@/data/seed-data';
+import { trackStoreClick } from '@/components/AnalyticsTracker';
 
 interface MarketplaceModalProps {
   isOpen: boolean;
@@ -127,6 +128,7 @@ export function MarketplaceModal({
             href={shopeeLink}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => trackStoreClick('Shopee', product.slug)}
             className="group flex items-center justify-between p-4 bg-white border border-[#D5D5CE] hover:border-[#EE4D2D] transition-all"
           >
             <div className="flex items-center gap-3.5">
@@ -155,6 +157,7 @@ export function MarketplaceModal({
             href={tiktokLink}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => trackStoreClick('TikTok Shop', product.slug)}
             className="group flex items-center justify-between p-4 bg-white border border-[#D5D5CE] hover:border-[#141517] transition-all"
           >
             <div className="flex items-center gap-3.5">
@@ -184,6 +187,7 @@ export function MarketplaceModal({
               href={tokopediaLink}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackStoreClick('Tokopedia', product.slug)}
               className="group flex items-center justify-between p-4 bg-white border border-[#D5D5CE] hover:border-[#03AC0E] transition-all"
             >
               <div className="flex items-center gap-3.5">
@@ -208,6 +212,7 @@ export function MarketplaceModal({
             href={waUrl}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => trackStoreClick('WhatsApp', product.slug)}
             className="group flex items-center justify-between p-4 bg-[#555D47] text-white hover:bg-[#444B38] transition-all"
           >
             <div className="flex items-center gap-3.5">

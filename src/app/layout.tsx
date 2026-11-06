@@ -2,6 +2,9 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
+import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/next';
+import { AnalyticsTracker } from '@/components/AnalyticsTracker';
 
 export const metadata: Metadata = {
   title: {
@@ -37,9 +40,12 @@ export default function RootLayout({
   return (
     <html lang="id">
       <body className="min-h-screen flex flex-col font-sans antialiased selection:bg-[#555D47] selection:text-white">
+        <AnalyticsTracker />
         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer />
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

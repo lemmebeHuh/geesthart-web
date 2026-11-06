@@ -1,0 +1,33 @@
+{
+  "totalPageViews": 1428,
+  "uniqueVisitors": 894,
+  "todayViews": 167,
+  "referrers": [
+    { "source": "Instagram (@geesthart)", "count": 642 },
+    { "source": "Direct / Link in Bio", "count": 315 },
+    { "source": "TikTok (@geesthart_)", "count": 284 },
+    { "source": "Google Search", "count": 127 },
+    { "source": "WhatsApp Share", "count": 60 }
+  ],
+  "popularPages": [
+    { "path": "/", "label": "Beranda (Hero Split)", "views": 724 },
+    { "path": "/catalog", "label": "Katalog Produk & Filter", "views": 489 },
+    { "path": "/product/fieldcore-jacket-nimble-x-series", "label": "Fieldcore Jacket Nimble X", "views": 312 },
+    { "path": "/product/geesthart-litefield-trackpants", "label": "Litefield Trackpants", "views": 248 },
+    { "path": "/product/litefield-skort-short-pants-women", "label": "Litefield Skort Women", "views": 196 },
+    { "path": "/lookbook", "label": "Editorial Lookbook", "views": 182 }
+  ],
+  "popularProducts": [
+    { "slug": "fieldcore-jacket-nimble-x-series", "name": "Fieldcore Jacket \"Nimble X Series\"", "views": 312 },
+    { "slug": "geesthart-litefield-trackpants", "name": "Geesthart Litefield Trackpants", "views": 248 },
+    { "slug": "litefield-skort-short-pants-women", "name": "Litefield Skort Short Pants Women", "views": 196 },
+    { "slug": "litefield-shortpants-unisex", "name": "Litefield Shortpants Unisex", "views": 142 },
+    { "slug": "fieldlite-packable-anorak-pullover", "name": "Fieldlite Packable Anorak Pullover", "views": 98 }
+  ],
+  "storeClicks": [
+    { "platform": "Shopee", "clicks": 284 },
+    { "platform": "WhatsApp", "clicks": 192 },
+    { "platform": "TikTok Shop", "clicks": 146 },
+    { "platform": "Tokopedia", "clicks": 38 }
+  ]
+}
