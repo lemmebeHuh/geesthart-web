@@ -76,10 +76,15 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
-            {relatedProducts.map((rel) => (
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-6">
+            {relatedProducts.slice(0, 2).map((rel) => (
               <ProductCard key={rel.id} product={rel} />
             ))}
+            {relatedProducts[2] && (
+              <div className="hidden lg:block">
+                <ProductCard product={relatedProducts[2]} />
+              </div>
+            )}
           </div>
         </div>
       </section>

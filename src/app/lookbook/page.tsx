@@ -82,15 +82,15 @@ export default async function LookbookPage() {
                 {entry.description}
               </p>
 
-              {/* Editorial Photo Grid */}
-              <div className="mt-6 sm:mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+              {/* Editorial Photo Grid: 1-over-2 bento on mobile, 3-col on desktop */}
+              <div className="mt-5 sm:mt-8 grid grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-5">
                 {entry.gallery.map((photoUrl, photoIdx) => (
                   <div
                     key={`${entry.id}-photo-${photoIdx}`}
                     className={`relative bg-[#EFEFEA] border border-[#DCDCD4] overflow-hidden group ${
                       photoIdx === 0 && entry.gallery.length === 3
-                        ? 'md:col-span-2 lg:col-span-1 aspect-[4/5]'
-                        : 'aspect-[4/5]'
+                        ? 'col-span-2 lg:col-span-1 aspect-[16/11] sm:aspect-[4/5]'
+                        : 'aspect-[3/4] sm:aspect-[4/5]'
                     }`}
                   >
                     <Image
@@ -100,8 +100,8 @@ export default async function LookbookPage() {
                       sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       className="object-cover group-hover:scale-103 transition-transform duration-500"
                     />
-                    <div className="absolute bottom-3 left-3 px-2.5 py-1 bg-[#141517]/90 text-white text-[11px] font-mono uppercase tracking-wider">
-                      Foto 0{idx + 1}.0{photoIdx + 1} • {entry.collection}
+                    <div className="absolute bottom-2 left-2 sm:bottom-3 sm:left-3 px-2 py-0.5 sm:px-2.5 sm:py-1 bg-[#141517]/90 text-white text-[9px] sm:text-[11px] font-mono uppercase tracking-wider">
+                      0{idx + 1}.0{photoIdx + 1} • {entry.collection}
                     </div>
                   </div>
                 ))}

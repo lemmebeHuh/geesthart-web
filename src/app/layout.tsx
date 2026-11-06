@@ -39,7 +39,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id">
-      <body className="min-h-screen flex flex-col font-sans antialiased selection:bg-[#3F4734] selection:text-white">
+      <body className="min-h-screen flex flex-col font-sans antialiased selection:bg-[#3F4734] selection:text-white pb-15 lg:pb-0">
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:px-4 focus:py-2.5 focus:bg-[#141517] focus:text-white focus:text-xs focus:font-bold focus:uppercase focus:tracking-wider"

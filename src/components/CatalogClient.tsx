@@ -413,61 +413,61 @@ export function CatalogClient({ products }: CatalogClientProps) {
   );
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-8 py-8 sm:py-12">
+    <div className="max-w-7xl mx-auto px-3.5 sm:px-8 py-5 sm:py-10">
       {/* Top Bar: Labeled Search + Quick Mobile Filter Trigger */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6 border-b border-[#DCDCD4]">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-3 pb-4 border-b border-[#DCDCD4]">
         <div className="flex-1 max-w-md">
           <label
             htmlFor="catalog-search-input"
-            className="block text-[11px] font-bold uppercase tracking-wider text-[#141517] mb-1.5"
+            className="block text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-[#141517] mb-1"
           >
             Cari Nama Produk atau Seri
           </label>
-          <div className="relative">
-            <Search
-              className="w-4 h-4 text-[#4A4D52] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"
-              aria-hidden="true"
-            />
-            <input
-              id="catalog-search-input"
-              type="search"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Ketik jaket, trackpants, skort, Nimble X..."
-              className="min-h-[44px] w-full pl-10 pr-4 py-2.5 bg-white border border-[#C8C8C0] text-xs font-medium text-[#141517] placeholder:text-[#686B70] focus:border-[#141517]"
-            />
-          </div>
-        </div>
-
-        <div className="flex flex-wrap items-center justify-between md:justify-end gap-3">
-          <p className="text-xs font-medium text-[#4A4D52]" aria-live="polite">
-            Menampilkan <strong className="text-[#141517]">{filteredProducts.length}</strong> dari{' '}
-            {products.length} artikel
-          </p>
-
           <div className="flex items-center gap-2">
-            {activeFilterCount > 0 && (
-              <button
-                type="button"
-                onClick={resetAllFilters}
-                className="min-h-[44px] inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold uppercase tracking-wider text-[#141517] bg-white border border-[#141517] hover:bg-[#EFEFEA] transition-colors"
-              >
-                <RotateCcw className="w-3.5 h-3.5" aria-hidden="true" />
-                <span>Reset ({activeFilterCount})</span>
-              </button>
-            )}
+            <div className="relative flex-1">
+              <Search
+                className="w-4 h-4 text-[#4A4D52] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
+                aria-hidden="true"
+              />
+              <input
+                id="catalog-search-input"
+                type="search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Cari jaket, trackpants, skort..."
+                className="min-h-[42px] w-full pl-9 pr-3 py-2 bg-white border border-[#C8C8C0] text-xs font-medium text-[#141517] placeholder:text-[#686B70] focus:border-[#141517]"
+              />
+            </div>
 
             <button
               type="button"
               onClick={() => setMobileFilterOpen(true)}
               aria-expanded={mobileFilterOpen}
               aria-controls="mobile-filter-dialog"
-              className="lg:hidden min-h-[44px] inline-flex items-center gap-2 px-4 py-2.5 bg-[#141517] text-white text-xs font-bold uppercase tracking-wider active:bg-[#3F4734]"
+              className="lg:hidden min-h-[42px] inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#141517] text-white text-xs font-bold uppercase tracking-wider active:bg-[#3F4734] shrink-0"
             >
-              <SlidersHorizontal className="w-4 h-4" aria-hidden="true" />
+              <SlidersHorizontal className="w-3.5 h-3.5" aria-hidden="true" />
               <span>Filter {activeFilterCount > 0 ? `(${activeFilterCount})` : ''}</span>
             </button>
           </div>
+        </div>
+
+        <div className="flex items-center justify-between md:justify-end gap-3">
+          <p className="text-[11px] sm:text-xs font-medium text-[#4A4D52]" aria-live="polite">
+            Menampilkan <strong className="text-[#141517]">{filteredProducts.length}</strong> dari{' '}
+            {products.length} produk
+          </p>
+
+          {activeFilterCount > 0 && (
+            <button
+              type="button"
+              onClick={resetAllFilters}
+              className="min-h-[34px] inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-[#141517] bg-white border border-[#141517] hover:bg-[#EFEFEA] transition-colors"
+            >
+              <RotateCcw className="w-3 h-3" aria-hidden="true" />
+              <span>Reset ({activeFilterCount})</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -475,7 +475,7 @@ export function CatalogClient({ products }: CatalogClientProps) {
       <div
         role="group"
         aria-label="Filter cepat kategori pakaian"
-        className="lg:hidden flex items-center gap-2 overflow-x-auto py-3.5 border-b border-[#DCDCD4] no-scrollbar"
+        className="lg:hidden flex items-center gap-1.5 overflow-x-auto py-3 border-b border-[#DCDCD4] no-scrollbar"
       >
         {CATEGORIES.map((cat) => {
           const active = selectedCategory === cat.value;
@@ -485,7 +485,7 @@ export function CatalogClient({ products }: CatalogClientProps) {
               type="button"
               onClick={() => setSelectedCategory(cat.value)}
               aria-pressed={active}
-              className={`min-h-[40px] px-3.5 py-2 text-xs font-bold uppercase tracking-wider whitespace-nowrap border shrink-0 transition-colors ${
+              className={`min-h-[36px] px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider whitespace-nowrap border shrink-0 transition-colors ${
                 active
                   ? 'bg-[#141517] text-white border-[#141517]'
                   : 'bg-white text-[#141517] border-[#C8C8C0]'
@@ -498,7 +498,7 @@ export function CatalogClient({ products }: CatalogClientProps) {
       </div>
 
       {/* Main Layout: Desktop Sidebar + Product Grid */}
-      <div className="mt-6 sm:mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="mt-4 sm:mt-8 grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8">
         {/* Desktop Sidebar Filter Panel (lg+) */}
         <aside
           aria-label="Filter Katalog Lengkap"
@@ -533,7 +533,7 @@ export function CatalogClient({ products }: CatalogClientProps) {
             onClick={() => setMobileFilterOpen(false)}
           >
             <div
-              className="bg-white w-full max-h-[88dvh] border-t-2 border-[#141517] flex flex-col"
+              className="bg-white w-full max-h-[85dvh] border-t-2 border-[#141517] flex flex-col"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Sticky Sheet Header */}
@@ -580,7 +580,7 @@ export function CatalogClient({ products }: CatalogClientProps) {
           </div>
         )}
 
-        {/* Product Grid Area (1 col phone -> 2 col tablet -> 3 col desktop) */}
+        {/* Product Grid Area (2 cols phone -> 2 cols tablet -> 3 cols desktop) */}
         <div className="lg:col-span-9">
           {filteredProducts.length === 0 ? (
             <div
@@ -602,7 +602,7 @@ export function CatalogClient({ products }: CatalogClientProps) {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-2 xl:grid-cols-3 gap-2.5 sm:gap-6">
               {filteredProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}

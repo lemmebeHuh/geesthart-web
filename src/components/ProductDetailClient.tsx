@@ -81,42 +81,42 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
   });
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-8 py-6 sm:py-12">
+    <div className="max-w-7xl mx-auto px-3.5 sm:px-8 py-4 sm:py-10">
       {/* Breadcrumb Navigation */}
       <nav
         aria-label="Breadcrumb"
-        className="flex flex-wrap items-center justify-between gap-4 pb-5 mb-6 sm:mb-8 border-b border-[#DCDCD4]"
+        className="flex items-center justify-between gap-3 pb-3.5 mb-4 sm:mb-8 border-b border-[#DCDCD4]"
       >
-        <div className="flex flex-wrap items-center gap-2 text-xs text-[#4A4D52]">
+        <div className="flex items-center gap-1.5 text-xs text-[#4A4D52] min-w-0">
           <Link
             href="/catalog"
-            className="min-h-[40px] inline-flex items-center gap-1.5 font-bold text-[#141517] hover:text-[#3F4734] transition-colors"
+            className="min-h-[36px] inline-flex items-center gap-1 font-bold text-[#141517] hover:text-[#3F4734] transition-colors shrink-0"
           >
-            <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+            <ArrowLeft className="w-3.5 h-3.5" aria-hidden="true" />
             <span>Katalog</span>
           </Link>
           <span aria-hidden="true">/</span>
           <Link
             href={`/catalog?collection=${encodeURIComponent(product.collection)}`}
-            className="min-h-[40px] inline-flex items-center font-semibold hover:text-[#141517]"
+            className="min-h-[36px] inline-flex items-center font-semibold hover:text-[#141517] shrink-0"
           >
-            Seri {product.collection}
+            {product.collection}
           </Link>
-          <span aria-hidden="true">/</span>
-          <span className="text-[#141517] font-bold truncate max-w-[180px] sm:max-w-none">
+          <span className="hidden sm:inline" aria-hidden="true">/</span>
+          <span className="hidden sm:inline text-[#141517] font-bold truncate">
             {product.name}
           </span>
         </div>
 
-        <span className="text-[11px] font-mono uppercase tracking-wider text-[#4A4D52]">
-          Kode: {product.id.toUpperCase()}
+        <span className="text-[10px] sm:text-[11px] font-mono uppercase tracking-wider text-[#4A4D52] shrink-0">
+          {product.id.toUpperCase()}
         </span>
       </nav>
 
       {/* Main Product Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-8 lg:gap-12">
         {/* Left: Gallery (7 cols) */}
-        <div className="lg:col-span-7 space-y-3 sm:space-y-4">
+        <div className="lg:col-span-7 space-y-2.5 sm:space-y-4">
           <div className="relative aspect-[4/5] w-full bg-white border border-[#DCDCD4] overflow-hidden">
             <Image
               src={activeImage}
@@ -127,22 +127,22 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
               sizes="(max-width: 1024px) 100vw, 58vw"
               className="object-cover"
             />
-            <div className="absolute top-3.5 left-3.5 flex flex-wrap items-center gap-2">
-              <span className="px-3 py-1 bg-[#141517] text-white text-xs font-bold uppercase tracking-[0.12em]">
+            <div className="absolute top-2.5 left-2.5 sm:top-3.5 sm:left-3.5 flex flex-wrap items-center gap-1.5 sm:gap-2">
+              <span className="px-2.5 py-1 bg-[#141517] text-white text-[10px] sm:text-xs font-bold uppercase tracking-[0.12em]">
                 {product.collection}
               </span>
               <span
-                className={`px-3 py-1 text-xs font-bold uppercase tracking-[0.1em] border flex items-center gap-1.5 ${badge.className}`}
+                className={`px-2.5 py-1 text-[10px] sm:text-xs font-bold uppercase tracking-[0.1em] border flex items-center gap-1.5 ${badge.className}`}
               >
-                <span className={`w-2 h-2 rounded-full ${badge.dotColor}`} aria-hidden="true" />
+                <span className={`w-1.5 h-1.5 rounded-full ${badge.dotColor}`} aria-hidden="true" />
                 {badge.label}
               </span>
             </div>
           </div>
 
-          {/* Thumbnail Strip (>= 44x44px touch targets) */}
+          {/* Thumbnail Strip (Horizontal scroll on mobile, 5-col grid on sm+) */}
           {allImages.length > 1 && (
-            <div className="grid grid-cols-4 sm:grid-cols-5 gap-2.5 sm:gap-3">
+            <div className="flex sm:grid sm:grid-cols-5 gap-2 sm:gap-3 overflow-x-auto no-scrollbar pb-1 sm:pb-0">
               {allImages.map((imgUrl, index) => {
                 const isActive = activeImage === imgUrl;
                 return (
@@ -152,7 +152,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                     onClick={() => setActiveImage(imgUrl)}
                     aria-label={`Tampilkan foto produk ke-${index + 1}`}
                     aria-pressed={isActive}
-                    className={`relative aspect-square min-h-[56px] bg-white border-2 overflow-hidden transition-all ${
+                    className={`relative w-16 h-16 sm:w-auto sm:h-auto sm:aspect-square shrink-0 bg-white border-2 overflow-hidden transition-all ${
                       isActive
                         ? 'border-[#141517]'
                         : 'border-[#DCDCD4] opacity-75 hover:opacity-100'
@@ -162,7 +162,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                       src={imgUrl}
                       alt={`${product.name} tampak ${index + 1}`}
                       fill
-                      sizes="120px"
+                      sizes="96px"
                       className="object-cover"
                     />
                   </button>

@@ -18,16 +18,16 @@ export default async function CatalogPage() {
   return (
     <div>
       {/* Header */}
-      <section className="bg-white border-b border-[#DCDCD4] py-8 sm:py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-8">
-          <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#3F4734]">
+      <section className="bg-white border-b border-[#DCDCD4] py-5 sm:py-10">
+        <div className="max-w-7xl mx-auto px-3.5 sm:px-8">
+          <p className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.14em] text-[#3F4734]">
             Arsip Produk Resmi • Geesthart Bandung
           </p>
-          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold uppercase tracking-tight text-[#141517] mt-1">
+          <h1 className="text-xl sm:text-4xl font-extrabold uppercase tracking-tight text-[#141517] mt-0.5">
             Katalog &amp; Panduan Ukuran
           </h1>
-          <p className="text-xs sm:text-sm text-[#4A4D52] mt-2 max-w-2xl leading-relaxed">
-            Saring koleksi berdasarkan seri (Nimble X, Litefield, Fieldlite), kategori pakaian, warna, harga, atau masukkan lebar pinggang celana dalam sentimeter.
+          <p className="text-xs sm:text-sm text-[#4A4D52] mt-1 max-w-2xl leading-relaxed">
+            Pilih seri koleksi, kategori pakaian, warna, atau saring berdasarkan ukuran lebar pinggang dalam sentimeter.
           </p>
         </div>
       </section>
@@ -37,9 +37,9 @@ export default async function CatalogPage() {
           <div
             role="status"
             aria-live="polite"
-            className="max-w-7xl mx-auto px-4 sm:px-8 py-16 text-xs font-bold uppercase tracking-wider text-[#4A4D52]"
+            className="max-w-7xl mx-auto px-3.5 sm:px-8 py-12 text-xs font-bold uppercase tracking-wider text-[#4A4D52]"
           >
-            Sedang memuat daftar produk dan tabel ukuran Geesthart...
+            Sedang memuat daftar produk Geesthart...
           </div>
         }
       >

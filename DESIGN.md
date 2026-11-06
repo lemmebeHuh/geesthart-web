@@ -1,4 +1,4 @@
-# DESIGN.md — Geesthart Bandung Design System & Anti-Slop Spec
+# DESIGN.md - Geesthart Bandung Design System & Anti-Slop Spec
 
 ## 1. Brand Identity & Soul
 - **Brand**: GEESTHART (Est. 2024, Bandung, Jawa Barat)
