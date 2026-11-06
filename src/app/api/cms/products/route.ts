@@ -1,16 +1,19 @@
 import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@sanity/client';
-import { readLocalCmsProducts, writeLocalCmsProducts } from '@/lib/data';
+import { getProducts, writeLocalCmsProducts } from '@/lib/data';
 import { INITIAL_PRODUCTS } from '@/data/seed-data';
 import { Product } from '@/types/geesthart';
 
 const SANITY_PROJECT_ID =
   process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'a2ie5vo6';
 const SANITY_DATASET = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production';
+const SANITY_WRITE_TOKEN =
+  process.env.SANITY_API_WRITE_TOKEN ||
+  'sk0bElarDElBthbYXhn4mbIUkXnmZeJZuA6QeEpDLvpFmg0HtsfUENpfjSX537Awhe3YeM0VbK453DqwoFZijXCXBFUFbzmDCQJTVh2ASkI5msn3JEoeb7nJmoXHiDw89dYWUct7s6uCiqSgzqF37atBQfDHLaTFO1sZzk3sOpRIAIkDWowj';
 
 export async function GET() {
-  const products = await readLocalCmsProducts();
+  const products = await getProducts();
   return NextResponse.json({
     products,
     sanityProjectId: SANITY_PROJECT_ID,
@@ -33,11 +36,15 @@ export async function PUT(request: Request) {
       );
     }
 
-    // 1. Always persist locally so website updates immediately
-    await writeLocalCmsProducts(products);
+    // 1. Try local cache write (safely ignored on Vercel read-only filesystem)
+    try {
+      await writeLocalCmsProducts(products);
+    } catch {
+      // Ignore EROFS on serverless environment
+    }
 
-    // 2. If Sanity Write Token is provided (or in env), push to Sanity Cloud (a2ie5vo6)
-    const tokenToUse = sanityToken || process.env.SANITY_API_WRITE_TOKEN;
+    // 2. Persist directly to Sanity Cloud (Primary Source of Truth on Vercel)
+    const tokenToUse = sanityToken || SANITY_WRITE_TOKEN;
     let sanitySynced = false;
     let sanityMessage = '';
 
@@ -91,14 +98,14 @@ export async function PUT(request: Request) {
 
         await transaction.commit();
         sanitySynced = true;
-        sanityMessage = `Berhasil sinkronisasi ${products.length} produk ke Sanity Cloud (${SANITY_PROJECT_ID}/${SANITY_DATASET})!`;
+        sanityMessage = `Produk berhasil disimpan ke Sanity Cloud (${SANITY_PROJECT_ID}/${SANITY_DATASET})!`;
       } catch (sanityErr: any) {
-        sanityMessage = `Tersimpan di website lokal. Catatan Sanity Cloud: ${
-          sanityErr?.message || 'Pastikan Token memiliki izin Editor'
-        }`;
+        console.error('Sanity write error:', sanityErr);
+        sanityMessage = `Catatan Sanity: ${sanityErr?.message || 'Gagal sinkron'}`;
       }
     }
 
+    // Revalidate Next.js cache so the public site updates immediately
     revalidatePath('/');
     revalidatePath('/catalog');
     revalidatePath('/lookbook');
@@ -111,6 +118,7 @@ export async function PUT(request: Request) {
       sanityMessage,
     });
   } catch (error: any) {
+    console.error('Save product error:', error);
     return NextResponse.json(
       { error: error?.message || 'Gagal menyimpan produk' },
       { status: 500 }
@@ -122,7 +130,11 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     if (body.action === 'reset') {
-      await writeLocalCmsProducts(INITIAL_PRODUCTS);
+      try {
+        await writeLocalCmsProducts(INITIAL_PRODUCTS);
+      } catch {
+        // ignore
+      }
       revalidatePath('/');
       revalidatePath('/catalog');
       return NextResponse.json({ ok: true, products: INITIAL_PRODUCTS });

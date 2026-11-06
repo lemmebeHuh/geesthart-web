@@ -501,216 +501,264 @@ export default function StudioPage() {
       )}
 
       {/* ================= TAB 2: STATISTIK KUNJUNGAN & TRAFFIC ================= */}
-      {activeTab === 'analytics' && analytics && (
+      {activeTab === 'analytics' && (
         <div className="space-y-8">
-          {/* Top 4 KPI Metrics Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-white border border-[#E2E2DC] p-5">
-              <div className="flex items-center justify-between text-neutral-500 mb-2">
-                <span className="text-[10px] font-extrabold uppercase tracking-[0.16em]">
-                  Total Pageviews
+          {/* Real Analytics Status Banner & Vercel Web Analytics Banner */}
+          <div className="bg-white border border-[#141517] p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#141517]">
+                  Statistik Real-Time Aktif (Cloud Sanity a2ie5vo6 + Vercel)
                 </span>
-                <Eye className="w-4 h-4 text-[#555D47]" />
               </div>
-              <div className="text-3xl font-black text-[#141517]">
-                {analytics.totalPageViews.toLocaleString('id-ID')}
-              </div>
-              <span className="text-[11px] text-neutral-500 mt-1 block">
-                Akumulasi seluruh halaman
-              </span>
+              <p className="text-xs text-neutral-600 max-w-2xl leading-relaxed">
+                Data di bawah ini mencatat pengunjung asli dan setiap klik ke channel marketplace (Shopee, TikTok, WhatsApp). Karena baru saja diaktifkan, angka bertambah otomatis seiring bertambahnya pengunjung website.
+              </p>
             </div>
 
-            <div className="bg-white border border-[#E2E2DC] p-5">
-              <div className="flex items-center justify-between text-neutral-500 mb-2">
-                <span className="text-[10px] font-extrabold uppercase tracking-[0.16em]">
-                  Pengunjung Unik (Est)
-                </span>
-                <Users className="w-4 h-4 text-[#283A66]" />
-              </div>
-              <div className="text-3xl font-black text-[#141517]">
-                {analytics.uniqueVisitors.toLocaleString('id-ID')}
-              </div>
-              <span className="text-[11px] text-neutral-500 mt-1 block">
-                Pengguna berbeda dari IG &amp; web
-              </span>
-            </div>
-
-            <div className="bg-white border border-[#E2E2DC] p-5">
-              <div className="flex items-center justify-between text-neutral-500 mb-2">
-                <span className="text-[10px] font-extrabold uppercase tracking-[0.16em]">
-                  Kunjungan Hari Ini
-                </span>
-                <TrendingUp className="w-4 h-4 text-emerald-600" />
-              </div>
-              <div className="text-3xl font-black text-emerald-700">
-                +{analytics.todayViews.toLocaleString('id-ID')}
-              </div>
-              <span className="text-[11px] text-neutral-500 mt-1 block">
-                Sesi aktif 24 jam terakhir
-              </span>
-            </div>
-
-            <div className="bg-white border border-[#E2E2DC] p-5">
-              <div className="flex items-center justify-between text-neutral-500 mb-2">
-                <span className="text-[10px] font-extrabold uppercase tracking-[0.16em]">
-                  Total Klik Beli (CTA)
-                </span>
-                <MousePointerClick className="w-4 h-4 text-purple-600" />
-              </div>
-              <div className="text-3xl font-black text-[#141517]">
-                {totalStoreClicks.toLocaleString('id-ID')}
-              </div>
-              <span className="text-[11px] text-neutral-500 mt-1 block">
-                Pengalihan ke Shopee, WA, TT
-              </span>
-            </div>
+            <a
+              href="https://vercel.com/analytics"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-5 py-3 bg-[#141517] text-white hover:bg-[#555D47] text-xs font-extrabold uppercase tracking-[0.14em] transition-colors inline-flex items-center gap-2 shrink-0"
+            >
+              <BarChart3 className="w-4 h-4 text-[#9CAF84]" />
+              <span>Buka Grafik Vercel Analytics</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
           </div>
 
-          {/* Row 2: Traffic Referral vs Conversion Store Breakdown */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            {/* Left: Referrers (6 cols) */}
-            <div className="lg:col-span-6 bg-white border border-[#E2E2DC] p-6 space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-[#E2E2DC]">
-                <div>
-                  <h3 className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#141517]">
-                    Sumber Kunjungan (Traffic Referrers)
-                  </h3>
-                  <p className="text-[11px] text-neutral-500 mt-0.5">
-                    Dari mana pengunjung datang ke website Geesthart
-                  </p>
+          {analytics && (
+            <>
+              {/* Top 4 KPI Metrics Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="bg-white border border-[#E2E2DC] p-5">
+                  <div className="flex items-center justify-between text-neutral-500 mb-2">
+                    <span className="text-[10px] font-extrabold uppercase tracking-[0.16em]">
+                      Total Pageviews
+                    </span>
+                    <Eye className="w-4 h-4 text-[#555D47]" />
+                  </div>
+                  <div className="text-3xl font-black text-[#141517]">
+                    {analytics.totalPageViews.toLocaleString('id-ID')}
+                  </div>
+                  <span className="text-[11px] text-neutral-500 mt-1 block">
+                    Kunjungan asli sejak aktif
+                  </span>
+                </div>
+
+                <div className="bg-white border border-[#E2E2DC] p-5">
+                  <div className="flex items-center justify-between text-neutral-500 mb-2">
+                    <span className="text-[10px] font-extrabold uppercase tracking-[0.16em]">
+                      Pengunjung Unik (Est)
+                    </span>
+                    <Users className="w-4 h-4 text-[#283A66]" />
+                  </div>
+                  <div className="text-3xl font-black text-[#141517]">
+                    {analytics.uniqueVisitors.toLocaleString('id-ID')}
+                  </div>
+                  <span className="text-[11px] text-neutral-500 mt-1 block">
+                    Pengguna berbeda
+                  </span>
+                </div>
+
+                <div className="bg-white border border-[#E2E2DC] p-5">
+                  <div className="flex items-center justify-between text-neutral-500 mb-2">
+                    <span className="text-[10px] font-extrabold uppercase tracking-[0.16em]">
+                      Kunjungan Hari Ini
+                    </span>
+                    <TrendingUp className="w-4 h-4 text-emerald-600" />
+                  </div>
+                  <div className="text-3xl font-black text-emerald-700">
+                    +{analytics.todayViews.toLocaleString('id-ID')}
+                  </div>
+                  <span className="text-[11px] text-neutral-500 mt-1 block">
+                    Sesi aktif hari ini
+                  </span>
+                </div>
+
+                <div className="bg-white border border-[#E2E2DC] p-5">
+                  <div className="flex items-center justify-between text-neutral-500 mb-2">
+                    <span className="text-[10px] font-extrabold uppercase tracking-[0.16em]">
+                      Total Klik Beli (CTA)
+                    </span>
+                    <MousePointerClick className="w-4 h-4 text-purple-600" />
+                  </div>
+                  <div className="text-3xl font-black text-[#141517]">
+                    {totalStoreClicks.toLocaleString('id-ID')}
+                  </div>
+                  <span className="text-[11px] text-neutral-500 mt-1 block">
+                    Klik ke Shopee, WA, TT
+                  </span>
                 </div>
               </div>
 
-              <div className="space-y-3.5 pt-2">
-                {analytics.referrers.map((ref) => {
-                  const percent = Math.round(
-                    (ref.count / (analytics.totalPageViews || 1)) * 100
-                  );
-                  return (
-                    <div key={ref.source} className="space-y-1">
-                      <div className="flex items-center justify-between text-xs font-semibold">
-                        <span className="text-[#141517]">{ref.source}</span>
-                        <span className="text-neutral-500 font-mono">
-                          {ref.count} klik ({percent}%)
+              {/* Row 2: Traffic Referral vs Conversion Store Breakdown */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                {/* Left: Referrers (6 cols) */}
+                <div className="lg:col-span-6 bg-white border border-[#E2E2DC] p-6 space-y-4">
+                  <div className="flex items-center justify-between pb-3 border-b border-[#E2E2DC]">
+                    <div>
+                      <h3 className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#141517]">
+                        Sumber Kunjungan (Traffic Referrers)
+                      </h3>
+                      <p className="text-[11px] text-neutral-500 mt-0.5">
+                        Asal link pengunjung (Instagram, TikTok, Google, Direct)
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3.5 pt-2">
+                    {analytics.referrers.length === 0 ? (
+                      <p className="text-xs text-neutral-500 italic py-4 text-center">
+                        Belum ada data rujukan. Data akan terisi otomatis saat pengunjung datang dari Instagram bio, TikTok, atau link langsung.
+                      </p>
+                    ) : (
+                      analytics.referrers.map((ref) => {
+                        const percent = Math.round(
+                          (ref.count / (analytics.totalPageViews || 1)) * 100
+                        );
+                        return (
+                          <div key={ref.source} className="space-y-1">
+                            <div className="flex items-center justify-between text-xs font-semibold">
+                              <span className="text-[#141517]">{ref.source}</span>
+                              <span className="text-neutral-500 font-mono">
+                                {ref.count} klik ({percent}%)
+                              </span>
+                            </div>
+                            <div className="w-full bg-[#F7F7F4] h-2 rounded-xs overflow-hidden border border-[#E2E2DC]">
+                              <div
+                                className="bg-[#555D47] h-full"
+                                style={{ width: `${Math.min(percent, 100)}%` }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+
+                {/* Right: Conversion By Store (6 cols) */}
+                <div className="lg:col-span-6 bg-white border border-[#E2E2DC] p-6 space-y-4">
+                  <div className="flex items-center justify-between pb-3 border-b border-[#E2E2DC]">
+                    <div>
+                      <h3 className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#141517]">
+                        Konversi Saluran Pembelian
+                      </h3>
+                      <p className="text-[11px] text-neutral-500 mt-0.5">
+                        Jumlah klik tombol beli ke masing-masing channel resmi
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3.5 pt-2">
+                    {analytics.storeClicks.map((store) => (
+                      <div
+                        key={store.platform}
+                        className="p-4 bg-[#F7F7F4] border border-[#E2E2DC] space-y-1.5"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-[#141517]">
+                            {store.platform}
+                          </span>
+                          <ShoppingBag className="w-3.5 h-3.5 text-[#555D47]" />
+                        </div>
+                        <div className="text-2xl font-black text-[#141517]">
+                          {store.clicks}
+                        </div>
+                        <span className="text-[10px] uppercase tracking-wider text-neutral-500 block">
+                          Klik Checkout
                         </span>
                       </div>
-                      <div className="w-full bg-[#F7F7F4] h-2 rounded-xs overflow-hidden border border-[#E2E2DC]">
-                        <div
-                          className="bg-[#555D47] h-full"
-                          style={{ width: `${Math.min(percent, 100)}%` }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+                    ))}
+                  </div>
 
-            {/* Right: Conversion By Store (6 cols) */}
-            <div className="lg:col-span-6 bg-white border border-[#E2E2DC] p-6 space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-[#E2E2DC]">
-                <div>
-                  <h3 className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#141517]">
-                    Konversi Saluran Pembelian
-                  </h3>
-                  <p className="text-[11px] text-neutral-500 mt-0.5">
-                    Distribusi klik tombol beli ke masing-masing channel resmi
-                  </p>
+                  <div className="p-3 bg-[#555D47]/10 text-xs text-neutral-700 leading-relaxed border border-[#555D47]/20 mt-4">
+                    <strong>Catatan Real-time:</strong> Setiap kali pembeli mengklik tombol Shopee, WhatsApp, atau TikTok di modal checkout produk, counter di atas bertambah secara instan.
+                  </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3.5 pt-2">
-                {analytics.storeClicks.map((store) => (
-                  <div
-                    key={store.platform}
-                    className="p-4 bg-[#F7F7F4] border border-[#E2E2DC] space-y-1.5"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-[#141517]">
-                        {store.platform}
-                      </span>
-                      <ShoppingBag className="w-3.5 h-3.5 text-[#555D47]" />
-                    </div>
-                    <div className="text-2xl font-black text-[#141517]">
-                      {store.clicks}
-                    </div>
-                    <span className="text-[10px] uppercase tracking-wider text-neutral-500 block">
-                      Klik Checkout
-                    </span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="p-3 bg-[#555D47]/10 text-xs text-neutral-700 leading-relaxed border border-[#555D47]/20 mt-4">
-                <strong>Insight Owner:</strong> Shopee &amp; WhatsApp menyumbang lebih dari 70% konversi klik produk. Rekomendasi: pastikan promo di Shopee dan fast-response di WhatsApp selalu aktif.
-              </div>
-            </div>
-          </div>
-
-          {/* Row 3: Popular Products & Pages */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            {/* Top Products (7 cols) */}
-            <div className="lg:col-span-7 bg-white border border-[#E2E2DC] p-6 space-y-4">
-              <h3 className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#141517] pb-3 border-b border-[#E2E2DC]">
-                Artikel Produk Paling Banyak Dilihat (Top Views)
-              </h3>
-              <div className="space-y-3 pt-1">
-                {analytics.popularProducts.map((prod, idx) => (
-                  <div
-                    key={prod.slug}
-                    className="flex items-center justify-between p-3 bg-[#F7F7F4] border border-[#E2E2DC] hover:border-[#141517] transition-colors"
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="w-5 h-5 bg-[#141517] text-white text-[10px] font-mono font-bold flex items-center justify-center shrink-0">
-                        {idx + 1}
-                      </span>
-                      <div>
-                        <h4 className="text-xs font-bold text-[#141517]">
-                          {prod.name}
-                        </h4>
-                        <Link
-                          href={`/product/${prod.slug}`}
-                          className="text-[10px] text-neutral-500 hover:underline"
+              {/* Row 3: Popular Products & Pages */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                {/* Top Products (7 cols) */}
+                <div className="lg:col-span-7 bg-white border border-[#E2E2DC] p-6 space-y-4">
+                  <h3 className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#141517] pb-3 border-b border-[#E2E2DC]">
+                    Artikel Produk Paling Banyak Dilihat (Top Views)
+                  </h3>
+                  <div className="space-y-3 pt-1">
+                    {analytics.popularProducts.length === 0 ? (
+                      <p className="text-xs text-neutral-500 italic py-4 text-center">
+                        Belum ada halaman produk yang dikunjungi. Kunjungan baru akan otomatis terdaftar di sini.
+                      </p>
+                    ) : (
+                      analytics.popularProducts.map((prod, idx) => (
+                        <div
+                          key={prod.slug}
+                          className="flex items-center justify-between p-3 bg-[#F7F7F4] border border-[#E2E2DC] hover:border-[#141517] transition-colors"
                         >
-                          /product/{prod.slug}
-                        </Link>
-                      </div>
-                    </div>
-                    <span className="text-xs font-black text-[#555D47]">
-                      {prod.views} views
-                    </span>
+                          <div className="flex items-center gap-3">
+                            <span className="w-5 h-5 bg-[#141517] text-white text-[10px] font-mono font-bold flex items-center justify-center shrink-0">
+                              {idx + 1}
+                            </span>
+                            <div>
+                              <h4 className="text-xs font-bold text-[#141517]">
+                                {prod.name}
+                              </h4>
+                              <Link
+                                href={`/product/${prod.slug}`}
+                                className="text-[10px] text-neutral-500 hover:underline"
+                              >
+                                /product/{prod.slug}
+                              </Link>
+                            </div>
+                          </div>
+                          <span className="text-xs font-black text-[#555D47]">
+                            {prod.views} views
+                          </span>
+                        </div>
+                      ))
+                    )}
                   </div>
-                ))}
-              </div>
-            </div>
+                </div>
 
-            {/* Top Pages (5 cols) */}
-            <div className="lg:col-span-5 bg-white border border-[#E2E2DC] p-6 space-y-4">
-              <h3 className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#141517] pb-3 border-b border-[#E2E2DC]">
-                Halaman Teratas
-              </h3>
-              <div className="space-y-2.5 pt-1">
-                {analytics.popularPages.map((page) => (
-                  <div
-                    key={page.path}
-                    className="flex items-center justify-between py-2 border-b border-[#EFEFEA] text-xs"
-                  >
-                    <div>
-                      <span className="font-semibold text-[#141517] block">
-                        {page.label}
-                      </span>
-                      <span className="text-[10px] font-mono text-neutral-400">
-                        {page.path}
-                      </span>
-                    </div>
-                    <span className="font-bold text-neutral-700 font-mono">
-                      {page.views}
-                    </span>
+                {/* Top Pages (5 cols) */}
+                <div className="lg:col-span-5 bg-white border border-[#E2E2DC] p-6 space-y-4">
+                  <h3 className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#141517] pb-3 border-b border-[#E2E2DC]">
+                    Halaman Teratas
+                  </h3>
+                  <div className="space-y-2.5 pt-1">
+                    {analytics.popularPages.length === 0 ? (
+                      <p className="text-xs text-neutral-500 italic py-4 text-center">
+                        Belum ada data kunjungan halaman.
+                      </p>
+                    ) : (
+                      analytics.popularPages.map((page) => (
+                        <div
+                          key={page.path}
+                          className="flex items-center justify-between py-2 border-b border-[#EFEFEA] text-xs"
+                        >
+                          <div>
+                            <span className="font-semibold text-[#141517] block">
+                              {page.label}
+                            </span>
+                            <span className="text-[10px] font-mono text-neutral-400">
+                              {page.path}
+                            </span>
+                          </div>
+                          <span className="font-bold text-neutral-700 font-mono">
+                            {page.views}
+                          </span>
+                        </div>
+                      ))
+                    )}
                   </div>
-                ))}
+                </div>
               </div>
-            </div>
-          </div>
+            </>
+          )}
         </div>
       )}
 

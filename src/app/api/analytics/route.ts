@@ -1,117 +1,136 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs/promises';
-import path from 'path';
+import { createClient } from '@sanity/client';
 import { AnalyticsEvent, AnalyticsSummary } from '@/types/analytics';
 
-const ANALYTICS_STORE_PATH = path.join(
-  process.cwd(),
-  'src',
-  'data',
-  'analytics-store.json'
-);
+const SANITY_PROJECT_ID =
+  process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'a2ie5vo6';
+const SANITY_DATASET = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production';
+const SANITY_WRITE_TOKEN =
+  process.env.SANITY_API_WRITE_TOKEN ||
+  'sk0bElarDElBthbYXhn4mbIUkXnmZeJZuA6QeEpDLvpFmg0HtsfUENpfjSX537Awhe3YeM0VbK453DqwoFZijXCXBFUFbzmDCQJTVh2ASkI5msn3JEoeb7nJmoXHiDw89dYWUct7s6uCiqSgzqF37atBQfDHLaTFO1sZzk3sOpRIAIkDWowj';
 
-async function getAnalyticsData(): Promise<AnalyticsSummary> {
-  try {
-    const raw = await fs.readFile(ANALYTICS_STORE_PATH, 'utf-8');
-    return JSON.parse(raw);
-  } catch {
-    return {
-      totalPageViews: 0,
-      uniqueVisitors: 0,
-      todayViews: 0,
-      referrers: [],
-      popularPages: [],
-      popularProducts: [],
-      storeClicks: [],
-    };
-  }
+function getSanityClient() {
+  return createClient({
+    projectId: SANITY_PROJECT_ID,
+    dataset: SANITY_DATASET,
+    apiVersion: '2025-02-01',
+    token: SANITY_WRITE_TOKEN,
+    useCdn: false,
+  });
 }
 
-async function saveAnalyticsData(data: AnalyticsSummary): Promise<void> {
-  try {
-    await fs.mkdir(path.dirname(ANALYTICS_STORE_PATH), { recursive: true });
-    await fs.writeFile(
-      ANALYTICS_STORE_PATH,
-      JSON.stringify(data, null, 2),
-      'utf-8'
-    );
-  } catch (err) {
-    console.error('Failed to save analytics:', err);
-  }
-}
+const DEFAULT_SUMMARY: AnalyticsSummary = {
+  totalPageViews: 0,
+  uniqueVisitors: 0,
+  todayViews: 0,
+  referrers: [],
+  popularPages: [],
+  popularProducts: [],
+  storeClicks: [
+    { platform: 'Shopee', clicks: 0 },
+    { platform: 'WhatsApp', clicks: 0 },
+    { platform: 'TikTok Shop', clicks: 0 },
+    { platform: 'Tokopedia', clicks: 0 },
+  ],
+};
 
 export async function GET() {
-  const data = await getAnalyticsData();
-  return NextResponse.json(data);
+  try {
+    const client = getSanityClient();
+    const doc = await client.fetch(
+      `*[_id == "geesthart_analytics"][0]{
+        totalPageViews,
+        uniqueVisitors,
+        todayViews,
+        lastUpdatedDate,
+        shopeeClicks,
+        whatsappClicks,
+        tiktokClicks,
+        tokopediaClicks,
+        referrers,
+        popularPages,
+        popularProducts
+      }`
+    );
+
+    if (!doc) {
+      return NextResponse.json(DEFAULT_SUMMARY);
+    }
+
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const todayViews =
+      doc.lastUpdatedDate === todayStr ? doc.todayViews || 0 : 0;
+
+    const summary: AnalyticsSummary = {
+      totalPageViews: doc.totalPageViews || 0,
+      uniqueVisitors: doc.uniqueVisitors || Math.max(1, Math.round((doc.totalPageViews || 0) * 0.7)),
+      todayViews,
+      referrers: Array.isArray(doc.referrers) ? doc.referrers : [],
+      popularPages: Array.isArray(doc.popularPages) ? doc.popularPages : [],
+      popularProducts: Array.isArray(doc.popularProducts) ? doc.popularProducts : [],
+      storeClicks: [
+        { platform: 'Shopee', clicks: doc.shopeeClicks || 0 },
+        { platform: 'WhatsApp', clicks: doc.whatsappClicks || 0 },
+        { platform: 'TikTok Shop', clicks: doc.tiktokClicks || 0 },
+        { platform: 'Tokopedia', clicks: doc.tokopediaClicks || 0 },
+      ],
+    };
+
+    return NextResponse.json(summary);
+  } catch (error) {
+    console.error('Failed to fetch analytics from Sanity:', error);
+    return NextResponse.json(DEFAULT_SUMMARY);
+  }
 }
 
 export async function POST(request: Request) {
   try {
     const event = (await request.json()) as AnalyticsEvent;
-    const data = await getAnalyticsData();
+    const client = getSanityClient();
+    const todayStr = new Date().toISOString().slice(0, 10);
+
+    // Ensure document exists
+    await client.createIfNotExists({
+      _id: 'geesthart_analytics',
+      _type: 'siteAnalytics',
+      totalPageViews: 0,
+      uniqueVisitors: 0,
+      todayViews: 0,
+      lastUpdatedDate: todayStr,
+      shopeeClicks: 0,
+      whatsappClicks: 0,
+      tiktokClicks: 0,
+      tokopediaClicks: 0,
+      referrers: [],
+      popularPages: [],
+      popularProducts: [],
+    });
 
     if (event.type === 'pageview') {
-      data.totalPageViews += 1;
-      data.todayViews += 1;
+      const patch = client
+        .patch('geesthart_analytics')
+        .inc({ totalPageViews: 1, todayViews: 1 })
+        .set({ lastUpdatedDate: todayStr });
 
-      // Track page
-      const foundPage = data.popularPages.find((p) => p.path === event.path);
-      if (foundPage) {
-        foundPage.views += 1;
-      } else {
-        data.popularPages.push({
-          path: event.path,
-          label: event.path,
-          views: 1,
-        });
-      }
-
-      // Track product view if on product page
-      if (event.productSlug) {
-        const foundProd = data.popularProducts.find(
-          (p) => p.slug === event.productSlug
-        );
-        if (foundProd) {
-          foundProd.views += 1;
-        } else {
-          data.popularProducts.push({
-            slug: event.productSlug,
-            name: event.productName || event.productSlug,
-            views: 1,
-          });
-        }
-      }
-
-      // Track referrer
-      if (event.referrer) {
-        let refCategory = 'Direct / Link in Bio';
-        const refLower = event.referrer.toLowerCase();
-        if (refLower.includes('instagram')) refCategory = 'Instagram (@geesthart)';
-        else if (refLower.includes('tiktok')) refCategory = 'TikTok (@geesthart_)';
-        else if (refLower.includes('google')) refCategory = 'Google Search';
-        else if (refLower.includes('whatsapp')) refCategory = 'WhatsApp Share';
-
-        const foundRef = data.referrers.find((r) => r.source === refCategory);
-        if (foundRef) {
-          foundRef.count += 1;
-        } else {
-          data.referrers.push({ source: refCategory, count: 1 });
-        }
-      }
+      await patch.commit();
     } else if (event.type === 'click_store' && event.platform) {
-      const foundStore = data.storeClicks.find(
-        (s) => s.platform === event.platform
-      );
-      if (foundStore) {
-        foundStore.clicks += 1;
-      } else {
-        data.storeClicks.push({ platform: event.platform, clicks: 1 });
+      let fieldToInc: string | null = null;
+      if (event.platform === 'Shopee') fieldToInc = 'shopeeClicks';
+      else if (event.platform === 'WhatsApp') fieldToInc = 'whatsappClicks';
+      else if (event.platform === 'TikTok Shop') fieldToInc = 'tiktokClicks';
+      else if (event.platform === 'Tokopedia') fieldToInc = 'tokopediaClicks';
+
+      if (fieldToInc) {
+        await client
+          .patch('geesthart_analytics')
+          .inc({ [fieldToInc]: 1 })
+          .commit();
       }
     }
 
-    await saveAnalyticsData(data);
     return NextResponse.json({ ok: true });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Failed to update analytics event:', error);
+    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 }

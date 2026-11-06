@@ -37,29 +37,24 @@ export async function readLocalCmsProducts(): Promise<Product[]> {
       return parsed;
     }
   } catch {
-    try {
-      await fs.mkdir(path.dirname(CMS_STORE_PATH), { recursive: true });
-      await fs.writeFile(
-        CMS_STORE_PATH,
-        JSON.stringify(INITIAL_PRODUCTS, null, 2),
-        'utf-8'
-      );
-    } catch {
-      // Ignore write error in read-only environments
-    }
+    // Safe fallback in serverless or before file creation
   }
   return INITIAL_PRODUCTS;
 }
 
 export async function writeLocalCmsProducts(products: Product[]): Promise<void> {
-  await fs.mkdir(path.dirname(CMS_STORE_PATH), { recursive: true });
-  await fs.writeFile(CMS_STORE_PATH, JSON.stringify(products, null, 2), 'utf-8');
+  // On Vercel / Lambda, filesystem is read-only (/var/task).
+  // Always wrap in try/catch so EROFS is safely ignored without crashing the API.
+  try {
+    await fs.mkdir(path.dirname(CMS_STORE_PATH), { recursive: true });
+    await fs.writeFile(CMS_STORE_PATH, JSON.stringify(products, null, 2), 'utf-8');
+  } catch {
+    // Expected in serverless read-only environments; data is stored in Sanity Cloud.
+  }
 }
 
 export async function getProducts(): Promise<Product[]> {
-  // Always read local CMS store first so any immediate edits in /studio are reflected
-  const localProducts = await readLocalCmsProducts();
-
+  // 1. Prioritize live data from Sanity Cloud if configured
   if (isSanityConfigured && sanityClient) {
     try {
       const raw = await sanityClient.fetch(PRODUCTS_QUERY, {}, { cache: 'no-store' });
@@ -120,11 +115,12 @@ export async function getProducts(): Promise<Product[]> {
         });
       }
     } catch (error) {
-      console.warn('Sanity fetch fallback to local CMS store:', error);
+      console.warn('Sanity fetch fallback to local data:', error);
     }
   }
 
-  return localProducts;
+  // 2. Fallback to local store or initial seed
+  return readLocalCmsProducts();
 }
 
 export async function getProductBySlug(
