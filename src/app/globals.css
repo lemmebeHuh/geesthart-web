@@ -5,17 +5,17 @@
   --bg-surface: #ffffff;
   --bg-muted: #efefea;
   --text-primary: #141517;
-  --text-secondary: #52555a;
-  --border-subtle: #e2e2dc;
-  --brand-olive: #555d47;
-  --brand-oxford: #283a66;
-  --brand-navy: #1e293b;
+  --text-secondary: #4a4d52;
+  --border-subtle: #dcdcd4;
+  --brand-olive: #3f4734;
+  --brand-olive-hover: #2f3627;
 }
 
 html {
   scroll-behavior: smooth;
   background-color: var(--bg-canvas);
   color: var(--text-primary);
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -23,6 +23,46 @@ body {
   color: var(--text-primary);
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   overflow-x: hidden;
+}
+
+/* R-39: Base layer pointer affordance for all enabled interactive controls */
+a[href],
+button:not(:disabled),
+summary,
+select:not(:disabled),
+label[for],
+input[type="checkbox"]:not(:disabled),
+input[type="radio"]:not(:disabled),
+[role="button"]:not([aria-disabled="true"]),
+[role="tab"]:not([aria-disabled="true"]),
+[role="switch"]:not([aria-disabled="true"]) {
+  cursor: pointer;
+}
+
+button:disabled,
+select:disabled,
+input:disabled,
+[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+/* R-32: High-contrast keyboard focus indicator (>= 3:1 against light & dark surfaces) */
+:focus-visible {
+  outline: 2px solid #141517;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.9);
+}
+
+/* R-39: Respect user motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* Custom editorial scrollbar */
@@ -36,10 +76,9 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c4c4bc;
+  background: #b5b5ad;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #555d47;
+  background: #3f4734;
 }
-

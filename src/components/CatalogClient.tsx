@@ -8,7 +8,7 @@ import {
   Search,
   Check,
   Ruler,
-  Sparkles,
+  X,
 } from 'lucide-react';
 import {
   Product,
@@ -26,8 +26,8 @@ interface CatalogClientProps {
 const CATEGORIES: { value: 'all' | ProductCategory; label: string }[] = [
   { value: 'all', label: 'Semua Kategori' },
   { value: 'jaket', label: 'Jaket' },
-  { value: 'celana-panjang', label: 'Celana Panjang (Trackpants)' },
-  { value: 'celana-pendek', label: 'Celana Pendek & Skort' },
+  { value: 'celana-panjang', label: 'Trackpants' },
+  { value: 'celana-pendek', label: 'Shortpants & Skort' },
 ];
 
 const COLLECTIONS: ('all' | ProductCollection)[] = [
@@ -38,7 +38,7 @@ const COLLECTIONS: ('all' | ProductCollection)[] = [
 ];
 
 const GENDERS: { value: 'all' | ProductGender; label: string }[] = [
-  { value: 'all', label: 'Semua (Unisex & Women)' },
+  { value: 'all', label: 'Semua (Unisex & Wanita)' },
   { value: 'unisex', label: 'Unisex' },
   { value: 'wanita', label: 'Wanita (Skort)' },
 ];
@@ -52,9 +52,9 @@ const STATUSES: { value: 'all' | ProductStatus; label: string }[] = [
 
 const PRICE_RANGES = [
   { id: 'all', label: 'Semua Harga', min: 0, max: Infinity },
-  { id: 'under-150k', label: '< Rp150.000', min: 0, max: 150000 },
-  { id: '150k-250k', label: 'Rp150.000 – Rp250.000', min: 150000, max: 250000 },
-  { id: 'above-250k', label: '> Rp250.000', min: 250000, max: Infinity },
+  { id: 'under-150k', label: 'Di bawah Rp150.000', min: 0, max: 150000 },
+  { id: '150k-250k', label: 'Rp150.000 s/d Rp250.000', min: 150000, max: 250000 },
+  { id: 'above-250k', label: 'Di atas Rp250.000', min: 250000, max: Infinity },
 ];
 
 export function CatalogClient({ products }: CatalogClientProps) {
@@ -90,7 +90,17 @@ export function CatalogClient({ products }: CatalogClientProps) {
     if (gen) setSelectedGender(gen);
   }, [searchParams]);
 
-  // Extract unique colors with hex from all products
+  // R-26 / R-32: Close mobile filter sheet on Escape
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && mobileFilterOpen) {
+        setMobileFilterOpen(false);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [mobileFilterOpen]);
+
   const allColors = useMemo(() => {
     const map = new Map<string, string>();
     products.forEach((p) => {
@@ -135,7 +145,6 @@ export function CatalogClient({ products }: CatalogClientProps) {
       if (product.price < priceObj.min || product.price > priceObj.max) {
         return false;
       }
-      // Waist filter (matches pinggangMin <= waistVal <= pinggangMax)
       if (waistVal !== null && !Number.isNaN(waistVal) && waistVal > 0) {
         const matchesWaist = product.sizeChart.some(
           (row) =>
@@ -190,298 +199,410 @@ export function CatalogClient({ products }: CatalogClientProps) {
     searchQuery.trim() !== '',
   ].filter(Boolean).length;
 
-  return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-8 py-10 sm:py-14">
-      {/* Top Bar: Search + Mobile Filter Toggle + Active Count */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-8 border-b border-[#E2E2DC]">
-        <div className="relative flex-1 max-w-md">
-          <Search className="w-4 h-4 text-neutral-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Cari jaket, trackpants, skort, Nimble X..."
-            className="w-full pl-10 pr-4 py-2.5 bg-white border border-[#D5D5CE] text-xs text-[#141517] placeholder:text-neutral-400 focus:outline-none focus:border-[#141517]"
-          />
-        </div>
-
-        <div className="flex items-center justify-between md:justify-end gap-3">
-          <span className="text-xs font-medium text-neutral-600">
-            Menampilkan <strong className="text-[#141517]">{filteredProducts.length}</strong> dari{' '}
-            {products.length} produk
-          </span>
-
-          {activeFilterCount > 0 && (
-            <button
-              type="button"
-              onClick={resetAllFilters}
-              className="inline-flex items-center gap-1.5 px-3 py-2 text-[11px] font-bold uppercase tracking-wider text-[#555D47] bg-[#555D47]/10 hover:bg-[#555D47]/20 transition-colors"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              <span>Reset ({activeFilterCount})</span>
-            </button>
-          )}
-
-          <button
-            type="button"
-            onClick={() => setMobileFilterOpen(!mobileFilterOpen)}
-            className="lg:hidden inline-flex items-center gap-2 px-3.5 py-2 bg-[#141517] text-white text-xs font-bold uppercase tracking-wider"
-          >
-            <SlidersHorizontal className="w-3.5 h-3.5" />
-            <span>Filter {activeFilterCount > 0 ? `(${activeFilterCount})` : ''}</span>
-          </button>
+  const filterFormContent = (
+    <div className="space-y-6">
+      {/* 1. Seri Koleksi */}
+      <div>
+        <h3 className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#141517] mb-2.5">
+          1. Seri Koleksi
+        </h3>
+        <div className="grid grid-cols-2 gap-2">
+          {COLLECTIONS.map((col) => {
+            const active = selectedCollection === col;
+            return (
+              <button
+                key={col}
+                type="button"
+                onClick={() => setSelectedCollection(col)}
+                aria-pressed={active}
+                className={`min-h-[44px] px-3 py-2 text-xs font-bold text-left border transition-colors ${
+                  active
+                    ? 'bg-[#141517] text-white border-[#141517]'
+                    : 'bg-[#F7F7F4] text-[#141517] border-[#C8C8C0] hover:border-[#141517]'
+                }`}
+              >
+                {col === 'all' ? 'Semua Seri' : col}
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {/* Main Layout: Sidebar Filters + Product Grid */}
-      <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Sidebar Filter Panel */}
-        <aside
-          className={`lg:col-span-3 space-y-6 bg-white p-5 border border-[#E2E2DC] h-fit ${
-            mobileFilterOpen ? 'block' : 'hidden lg:block'
-          }`}
+      {/* 2. Kategori Produk */}
+      <div className="pt-4 border-t border-[#EFEFEA]">
+        <h3 className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#141517] mb-2.5">
+          2. Kategori Pakaian
+        </h3>
+        <div className="space-y-2">
+          {CATEGORIES.map((cat) => {
+            const active = selectedCategory === cat.value;
+            return (
+              <button
+                key={cat.value}
+                type="button"
+                onClick={() => setSelectedCategory(cat.value)}
+                aria-pressed={active}
+                className={`min-h-[44px] w-full flex items-center justify-between px-3.5 py-2 text-xs font-bold border transition-colors ${
+                  active
+                    ? 'bg-[#3F4734] text-white border-[#3F4734]'
+                    : 'bg-white text-[#141517] border-[#C8C8C0] hover:bg-[#F7F7F4]'
+                }`}
+              >
+                <span>{cat.label}</span>
+                {active && <Check className="w-4 h-4 shrink-0" aria-hidden="true" />}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 3. Gender / Tipe */}
+      <div className="pt-4 border-t border-[#EFEFEA]">
+        <h3 className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#141517] mb-2.5">
+          3. Tipe Pemakai
+        </h3>
+        <div className="space-y-2">
+          {GENDERS.map((g) => {
+            const active = selectedGender === g.value;
+            return (
+              <button
+                key={g.value}
+                type="button"
+                onClick={() => setSelectedGender(g.value)}
+                aria-pressed={active}
+                className={`min-h-[44px] w-full flex items-center justify-between px-3.5 py-2 text-xs font-bold border transition-colors ${
+                  active
+                    ? 'bg-[#141517] text-white border-[#141517]'
+                    : 'bg-white text-[#141517] border-[#C8C8C0] hover:bg-[#F7F7F4]'
+                }`}
+              >
+                <span>{g.label}</span>
+                {active && <Check className="w-4 h-4 shrink-0" aria-hidden="true" />}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 4. Pilihan Warna */}
+      <div className="pt-4 border-t border-[#EFEFEA]">
+        <h3 className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#141517] mb-2.5">
+          4. Warna Artikel
+        </h3>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => setSelectedColor('all')}
+            aria-pressed={selectedColor === 'all'}
+            className={`min-h-[40px] px-3 py-1.5 text-xs font-bold border transition-colors ${
+              selectedColor === 'all'
+                ? 'bg-[#141517] text-white border-[#141517]'
+                : 'bg-[#F7F7F4] text-[#141517] border-[#C8C8C0]'
+            }`}
+          >
+            Semua
+          </button>
+          {allColors.map((c) => {
+            const active = selectedColor.toLowerCase() === c.name.toLowerCase();
+            return (
+              <button
+                key={c.name}
+                type="button"
+                onClick={() => setSelectedColor(active ? 'all' : c.name)}
+                aria-pressed={active}
+                className={`min-h-[40px] inline-flex items-center gap-2 px-3 py-1.5 text-xs font-semibold border transition-colors ${
+                  active
+                    ? 'bg-[#141517] text-white border-[#141517]'
+                    : 'bg-white text-[#141517] border-[#C8C8C0] hover:border-[#141517]'
+                }`}
+              >
+                <span
+                  className="w-3.5 h-3.5 rounded-full border border-black/25 shrink-0"
+                  style={{ backgroundColor: c.hex }}
+                  aria-hidden="true"
+                />
+                <span>{c.name}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 5. Rentang Harga */}
+      <div className="pt-4 border-t border-[#EFEFEA]">
+        <h3 className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#141517] mb-2.5">
+          5. Rentang Harga
+        </h3>
+        <div className="space-y-2">
+          {PRICE_RANGES.map((range) => {
+            const active = selectedPriceRange === range.id;
+            return (
+              <button
+                key={range.id}
+                type="button"
+                onClick={() => setSelectedPriceRange(range.id)}
+                aria-pressed={active}
+                className={`min-h-[44px] w-full flex items-center justify-between px-3.5 py-2 text-xs font-bold border transition-colors ${
+                  active
+                    ? 'bg-[#141517] text-white border-[#141517]'
+                    : 'bg-white text-[#141517] border-[#C8C8C0] hover:bg-[#F7F7F4]'
+                }`}
+              >
+                <span>{range.label}</span>
+                {active && <Check className="w-4 h-4 shrink-0" aria-hidden="true" />}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 6. Status Stok */}
+      <div className="pt-4 border-t border-[#EFEFEA]">
+        <h3 className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#141517] mb-2.5">
+          6. Status Ketersediaan
+        </h3>
+        <div className="grid grid-cols-2 gap-2">
+          {STATUSES.map((st) => {
+            const active = selectedStatus === st.value;
+            return (
+              <button
+                key={st.value}
+                type="button"
+                onClick={() => setSelectedStatus(st.value)}
+                aria-pressed={active}
+                className={`min-h-[44px] px-3 py-2 text-xs font-bold border text-left transition-colors ${
+                  active
+                    ? 'bg-[#141517] text-white border-[#141517]'
+                    : 'bg-[#F7F7F4] text-[#141517] border-[#C8C8C0]'
+                }`}
+              >
+                {st.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 7. Smart Filter Lebar Pinggang (cm) */}
+      <div className="pt-4 border-t border-[#EFEFEA]">
+        <label
+          htmlFor="waist-filter-input"
+          className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#3F4734] flex items-center gap-1.5 mb-1.5"
         >
-          <div className="flex items-center justify-between pb-3 border-b border-[#EFEFEA]">
-            <h2 className="text-xs font-extrabold uppercase tracking-[0.18em] text-[#141517] flex items-center gap-2">
-              <SlidersHorizontal className="w-3.5 h-3.5 text-[#555D47]" />
+          <Ruler className="w-4 h-4" aria-hidden="true" />
+          <span>7. Lebar Pinggang Celana (cm)</span>
+        </label>
+        <p className="text-xs text-[#4A4D52] mb-2.5 leading-relaxed">
+          Masukkan angka 28 s/d 41 cm untuk mencari trackpants atau shortpants yang muat di pinggang Anda.
+        </p>
+        <div className="flex items-center gap-2">
+          <input
+            id="waist-filter-input"
+            type="number"
+            min={25}
+            max={50}
+            value={waistCmFilter}
+            onChange={(e) => setWaistCmFilter(e.target.value)}
+            placeholder="Contoh: 34"
+            className="min-h-[44px] w-full px-3.5 py-2 text-xs font-semibold bg-[#F7F7F4] border border-[#C8C8C0] text-[#141517] placeholder:text-[#686B70] focus:border-[#141517]"
+          />
+          <span className="text-xs font-extrabold text-[#141517] px-2">CM</span>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-8 py-8 sm:py-12">
+      {/* Top Bar: Labeled Search + Quick Mobile Filter Trigger */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6 border-b border-[#DCDCD4]">
+        <div className="flex-1 max-w-md">
+          <label
+            htmlFor="catalog-search-input"
+            className="block text-[11px] font-bold uppercase tracking-wider text-[#141517] mb-1.5"
+          >
+            Cari Nama Produk atau Seri
+          </label>
+          <div className="relative">
+            <Search
+              className="w-4 h-4 text-[#4A4D52] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"
+              aria-hidden="true"
+            />
+            <input
+              id="catalog-search-input"
+              type="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Ketik jaket, trackpants, skort, Nimble X..."
+              className="min-h-[44px] w-full pl-10 pr-4 py-2.5 bg-white border border-[#C8C8C0] text-xs font-medium text-[#141517] placeholder:text-[#686B70] focus:border-[#141517]"
+            />
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center justify-between md:justify-end gap-3">
+          <p className="text-xs font-medium text-[#4A4D52]" aria-live="polite">
+            Menampilkan <strong className="text-[#141517]">{filteredProducts.length}</strong> dari{' '}
+            {products.length} artikel
+          </p>
+
+          <div className="flex items-center gap-2">
+            {activeFilterCount > 0 && (
+              <button
+                type="button"
+                onClick={resetAllFilters}
+                className="min-h-[44px] inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold uppercase tracking-wider text-[#141517] bg-white border border-[#141517] hover:bg-[#EFEFEA] transition-colors"
+              >
+                <RotateCcw className="w-3.5 h-3.5" aria-hidden="true" />
+                <span>Reset ({activeFilterCount})</span>
+              </button>
+            )}
+
+            <button
+              type="button"
+              onClick={() => setMobileFilterOpen(true)}
+              aria-expanded={mobileFilterOpen}
+              aria-controls="mobile-filter-dialog"
+              className="lg:hidden min-h-[44px] inline-flex items-center gap-2 px-4 py-2.5 bg-[#141517] text-white text-xs font-bold uppercase tracking-wider active:bg-[#3F4734]"
+            >
+              <SlidersHorizontal className="w-4 h-4" aria-hidden="true" />
+              <span>Filter {activeFilterCount > 0 ? `(${activeFilterCount})` : ''}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* 1-Tap Quick Category Pills for Mobile & Tablet (< lg) */}
+      <div
+        role="group"
+        aria-label="Filter cepat kategori pakaian"
+        className="lg:hidden flex items-center gap-2 overflow-x-auto py-3.5 border-b border-[#DCDCD4] no-scrollbar"
+      >
+        {CATEGORIES.map((cat) => {
+          const active = selectedCategory === cat.value;
+          return (
+            <button
+              key={cat.value}
+              type="button"
+              onClick={() => setSelectedCategory(cat.value)}
+              aria-pressed={active}
+              className={`min-h-[40px] px-3.5 py-2 text-xs font-bold uppercase tracking-wider whitespace-nowrap border shrink-0 transition-colors ${
+                active
+                  ? 'bg-[#141517] text-white border-[#141517]'
+                  : 'bg-white text-[#141517] border-[#C8C8C0]'
+              }`}
+            >
+              {cat.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Main Layout: Desktop Sidebar + Product Grid */}
+      <div className="mt-6 sm:mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Desktop Sidebar Filter Panel (lg+) */}
+        <aside
+          aria-label="Filter Katalog Lengkap"
+          className="hidden lg:block lg:col-span-3 bg-white p-5 border border-[#DCDCD4] h-fit"
+        >
+          <div className="flex items-center justify-between pb-3 mb-5 border-b border-[#EFEFEA]">
+            <h2 className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#141517] flex items-center gap-2">
+              <SlidersHorizontal className="w-3.5 h-3.5 text-[#3F4734]" aria-hidden="true" />
               <span>Filter Katalog</span>
             </h2>
             {activeFilterCount > 0 && (
               <button
                 type="button"
                 onClick={resetAllFilters}
-                className="text-[11px] font-semibold text-neutral-500 hover:text-[#141517] underline"
+                className="text-xs font-bold text-[#3F4734] hover:underline"
               >
                 Hapus Semua
               </button>
             )}
           </div>
-
-          {/* 1. Seri Koleksi */}
-          <div>
-            <h3 className="text-[11px] font-bold uppercase tracking-[0.15em] text-neutral-500 mb-2.5">
-              1. Seri Koleksi
-            </h3>
-            <div className="grid grid-cols-2 gap-1.5">
-              {COLLECTIONS.map((col) => {
-                const active = selectedCollection === col;
-                return (
-                  <button
-                    key={col}
-                    type="button"
-                    onClick={() => setSelectedCollection(col)}
-                    className={`px-2.5 py-2 text-xs font-semibold text-left border transition-colors ${
-                      active
-                        ? 'bg-[#141517] text-white border-[#141517]'
-                        : 'bg-[#F7F7F4] text-neutral-700 border-[#E2E2DC] hover:border-neutral-400'
-                    }`}
-                  >
-                    {col === 'all' ? 'Semua Seri' : col}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* 2. Kategori Produk */}
-          <div className="pt-4 border-t border-[#EFEFEA]">
-            <h3 className="text-[11px] font-bold uppercase tracking-[0.15em] text-neutral-500 mb-2.5">
-              2. Kategori Produk
-            </h3>
-            <div className="space-y-1.5">
-              {CATEGORIES.map((cat) => {
-                const active = selectedCategory === cat.value;
-                return (
-                  <button
-                    key={cat.value}
-                    type="button"
-                    onClick={() => setSelectedCategory(cat.value)}
-                    className={`w-full flex items-center justify-between px-3 py-2 text-xs font-medium border transition-colors ${
-                      active
-                        ? 'bg-[#555D47] text-white border-[#555D47]'
-                        : 'bg-white text-neutral-700 border-[#E2E2DC] hover:bg-[#F7F7F4]'
-                    }`}
-                  >
-                    <span>{cat.label}</span>
-                    {active && <Check className="w-3.5 h-3.5" />}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* 3. Gender / Tipe */}
-          <div className="pt-4 border-t border-[#EFEFEA]">
-            <h3 className="text-[11px] font-bold uppercase tracking-[0.15em] text-neutral-500 mb-2.5">
-              3. Gender / Tipe
-            </h3>
-            <div className="space-y-1.5">
-              {GENDERS.map((g) => {
-                const active = selectedGender === g.value;
-                return (
-                  <button
-                    key={g.value}
-                    type="button"
-                    onClick={() => setSelectedGender(g.value)}
-                    className={`w-full flex items-center justify-between px-3 py-2 text-xs font-medium border transition-colors ${
-                      active
-                        ? 'bg-[#141517] text-white border-[#141517]'
-                        : 'bg-white text-neutral-700 border-[#E2E2DC] hover:bg-[#F7F7F4]'
-                    }`}
-                  >
-                    <span>{g.label}</span>
-                    {active && <Check className="w-3.5 h-3.5" />}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* 4. Pilihan Warna */}
-          <div className="pt-4 border-t border-[#EFEFEA]">
-            <h3 className="text-[11px] font-bold uppercase tracking-[0.15em] text-neutral-500 mb-2.5">
-              4. Pilihan Warna
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={() => setSelectedColor('all')}
-                className={`px-2.5 py-1 text-[11px] font-semibold border transition-colors ${
-                  selectedColor === 'all'
-                    ? 'bg-[#141517] text-white border-[#141517]'
-                    : 'bg-[#F7F7F4] text-neutral-700 border-[#E2E2DC]'
-                }`}
-              >
-                Semua
-              </button>
-              {allColors.map((c) => {
-                const active = selectedColor.toLowerCase() === c.name.toLowerCase();
-                return (
-                  <button
-                    key={c.name}
-                    type="button"
-                    onClick={() =>
-                      setSelectedColor(active ? 'all' : c.name)
-                    }
-                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium border transition-colors ${
-                      active
-                        ? 'bg-[#141517] text-white border-[#141517]'
-                        : 'bg-white text-neutral-700 border-[#E2E2DC] hover:border-neutral-400'
-                    }`}
-                  >
-                    <span
-                      className="w-3 h-3 rounded-full border border-neutral-300"
-                      style={{ backgroundColor: c.hex }}
-                    />
-                    <span>{c.name}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* 5. Rentang Harga */}
-          <div className="pt-4 border-t border-[#EFEFEA]">
-            <h3 className="text-[11px] font-bold uppercase tracking-[0.15em] text-neutral-500 mb-2.5">
-              5. Rentang Harga
-            </h3>
-            <div className="space-y-1.5">
-              {PRICE_RANGES.map((range) => {
-                const active = selectedPriceRange === range.id;
-                return (
-                  <button
-                    key={range.id}
-                    type="button"
-                    onClick={() => setSelectedPriceRange(range.id)}
-                    className={`w-full flex items-center justify-between px-3 py-2 text-xs font-medium border transition-colors ${
-                      active
-                        ? 'bg-[#141517] text-white border-[#141517]'
-                        : 'bg-white text-neutral-700 border-[#E2E2DC] hover:bg-[#F7F7F4]'
-                    }`}
-                  >
-                    <span>{range.label}</span>
-                    {active && <Check className="w-3.5 h-3.5" />}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* 6. Status Stok */}
-          <div className="pt-4 border-t border-[#EFEFEA]">
-            <h3 className="text-[11px] font-bold uppercase tracking-[0.15em] text-neutral-500 mb-2.5">
-              6. Status Ketersediaan
-            </h3>
-            <div className="grid grid-cols-2 gap-1.5">
-              {STATUSES.map((st) => {
-                const active = selectedStatus === st.value;
-                return (
-                  <button
-                    key={st.value}
-                    type="button"
-                    onClick={() => setSelectedStatus(st.value)}
-                    className={`px-2.5 py-2 text-xs font-medium border text-left transition-colors ${
-                      active
-                        ? 'bg-[#141517] text-white border-[#141517]'
-                        : 'bg-[#F7F7F4] text-neutral-700 border-[#E2E2DC]'
-                    }`}
-                  >
-                    {st.label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* 7. Smart Filter Lebar Pinggang (cm) sesuai Brief */}
-          <div className="pt-4 border-t border-[#EFEFEA]">
-            <label
-              htmlFor="waist-filter"
-              className="text-[11px] font-bold uppercase tracking-[0.15em] text-[#555D47] flex items-center gap-1.5 mb-1.5"
-            >
-              <Ruler className="w-3.5 h-3.5" />
-              <span>Filter Lebar Pinggang (Celana)</span>
-            </label>
-            <p className="text-[11px] text-neutral-500 mb-2">
-              Masukkan lebar pinggang (28–41 cm) untuk mencocokkan celana panjang/pendek.
-            </p>
-            <div className="flex items-center gap-2">
-              <input
-                id="waist-filter"
-                type="number"
-                min={25}
-                max={50}
-                value={waistCmFilter}
-                onChange={(e) => setWaistCmFilter(e.target.value)}
-                placeholder="Contoh: 34"
-                className="w-full px-3 py-2 text-xs bg-[#F7F7F4] border border-[#D5D5CE] focus:outline-none focus:border-[#141517]"
-              />
-              <span className="text-xs font-bold text-neutral-500">CM</span>
-            </div>
-          </div>
+          {filterFormContent}
         </aside>
 
-        {/* Product Grid Area */}
+        {/* Mobile Slide-Over Filter Sheet (< lg) */}
+        {mobileFilterOpen && (
+          <div
+            id="mobile-filter-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Filter Katalog Produk"
+            className="lg:hidden fixed inset-0 z-50 bg-black/70 flex flex-col justify-end"
+            onClick={() => setMobileFilterOpen(false)}
+          >
+            <div
+              className="bg-white w-full max-h-[88dvh] border-t-2 border-[#141517] flex flex-col"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Sticky Sheet Header */}
+              <div className="px-4 py-3.5 bg-[#141517] text-white flex items-center justify-between shrink-0">
+                <div className="flex items-center gap-2">
+                  <SlidersHorizontal className="w-4 h-4 text-[#B8CCA0]" aria-hidden="true" />
+                  <h2 className="text-xs font-extrabold uppercase tracking-[0.14em]">
+                    Filter Katalog ({filteredProducts.length} Produk)
+                  </h2>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setMobileFilterOpen(false)}
+                  aria-label="Tutup panel filter"
+                  className="min-w-[44px] min-h-[44px] -mr-2 inline-flex items-center justify-center text-neutral-300 hover:text-white"
+                >
+                  <X className="w-5 h-5" aria-hidden="true" />
+                </button>
+              </div>
+
+              {/* Scrollable Sheet Body */}
+              <div className="p-4 overflow-y-auto flex-1">
+                {filterFormContent}
+              </div>
+
+              {/* Sticky Sheet Footer */}
+              <div className="p-4 bg-[#F7F7F4] border-t border-[#DCDCD4] grid grid-cols-2 gap-3 shrink-0">
+                <button
+                  type="button"
+                  onClick={resetAllFilters}
+                  className="min-h-[44px] px-4 py-2.5 bg-white border border-[#141517] text-[#141517] text-xs font-bold uppercase tracking-wider"
+                >
+                  Reset Filter
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMobileFilterOpen(false)}
+                  className="min-h-[44px] px-4 py-2.5 bg-[#141517] text-white text-xs font-extrabold uppercase tracking-wider"
+                >
+                  Terapkan ({filteredProducts.length})
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Product Grid Area (1 col phone -> 2 col tablet -> 3 col desktop) */}
         <div className="lg:col-span-9">
           {filteredProducts.length === 0 ? (
-            <div className="bg-white border border-[#E2E2DC] p-12 text-center">
-              <Sparkles className="w-8 h-8 text-neutral-400 mx-auto mb-3" />
-              <h3 className="text-lg font-bold text-[#141517]">
-                Tidak ada produk yang cocok dengan filter ini
+            <div
+              role="status"
+              className="bg-white border border-[#DCDCD4] p-8 sm:p-12 text-center"
+            >
+              <h3 className="text-base sm:text-lg font-extrabold text-[#141517]">
+                Tidak ada produk yang cocok dengan filter pilihan Anda
               </h3>
-              <p className="text-xs text-neutral-500 mt-1 max-w-md mx-auto">
-                Coba ubah kombinasi filter kategori, warna, rentang harga, atau tekan tombol reset di bawah.
+              <p className="text-xs sm:text-sm text-[#4A4D52] mt-1.5 max-w-md mx-auto leading-relaxed">
+                Kombinasi filter kategori, warna, atau lebar pinggang saat ini belum memiliki artikel yang sesuai. Reset filter untuk menampilkan seluruh koleksi Geesthart.
               </p>
               <button
                 type="button"
                 onClick={resetAllFilters}
-                className="mt-5 px-5 py-2.5 bg-[#141517] text-white text-xs font-bold uppercase tracking-[0.15em] hover:bg-[#555D47] transition-colors"
+                className="mt-5 min-h-[44px] px-5 py-2.5 bg-[#141517] text-white text-xs font-bold uppercase tracking-[0.14em] hover:bg-[#3F4734] transition-colors"
               >
-                Reset Semua Filter
+                Tampilkan Semua Produk ({products.length})
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-6">
               {filteredProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
@@ -492,4 +613,3 @@ export function CatalogClient({ products }: CatalogClientProps) {
     </div>
   );
 }
-

@@ -7,9 +7,9 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export const metadata: Metadata = {
-  title: 'Katalog Produk & Size Chart',
+  title: 'Katalog Produk & Tabel Ukuran',
   description:
-    'Katalog lengkap jaket teknikal, celana panjang trackpants, celana pendek, dan skort Geesthart beserta filter ukuran dan warna.',
+    'Katalog lengkap jaket parachute crinkle, celana panjang trackpants, celana pendek, dan active skort Geesthart beserta filter ukuran pinggang dan warna.',
 };
 
 export default async function CatalogPage() {
@@ -17,25 +17,29 @@ export default async function CatalogPage() {
 
   return (
     <div>
-      {/* Editorial Header */}
-      <section className="bg-white border-b border-[#E2E2DC] py-10 sm:py-14">
+      {/* Header */}
+      <section className="bg-white border-b border-[#DCDCD4] py-8 sm:py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-8">
-          <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#555D47]">
-            GEESTHART TECHNICAL ARCHIVE // ALL DROPS
-          </span>
-          <h1 className="text-3xl sm:text-5xl font-extrabold uppercase tracking-tight text-[#141517] mt-1">
-            KATALOG PRODUK
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#3F4734]">
+            Arsip Produk Resmi • Geesthart Bandung
+          </p>
+          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold uppercase tracking-tight text-[#141517] mt-1">
+            Katalog &amp; Panduan Ukuran
           </h1>
-          <p className="text-xs sm:text-sm text-neutral-600 mt-2 max-w-2xl leading-relaxed">
-            Gunakan filter di samping untuk menyaring berdasarkan Seri Koleksi (Nimble X, Litefield, Fieldlite), Kategori, Gender, Warna, Status Stok, maupun Ukuran Lebar Pinggang.
+          <p className="text-xs sm:text-sm text-[#4A4D52] mt-2 max-w-2xl leading-relaxed">
+            Saring koleksi berdasarkan seri (Nimble X, Litefield, Fieldlite), kategori pakaian, warna, harga, atau masukkan lebar pinggang celana dalam sentimeter.
           </p>
         </div>
       </section>
 
       <Suspense
         fallback={
-          <div className="max-w-7xl mx-auto px-4 sm:px-8 py-16 text-xs uppercase tracking-widest text-neutral-500">
-            Memuat katalog Geesthart...
+          <div
+            role="status"
+            aria-live="polite"
+            className="max-w-7xl mx-auto px-4 sm:px-8 py-16 text-xs font-bold uppercase tracking-wider text-[#4A4D52]"
+          >
+            Sedang memuat daftar produk dan tabel ukuran Geesthart...
           </div>
         }
       >
@@ -44,4 +48,3 @@ export default async function CatalogPage() {
     </div>
   );
 }
-

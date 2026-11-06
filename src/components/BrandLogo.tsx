@@ -16,7 +16,7 @@ export function BrandLogo({
     sm: { width: 110, height: 34, boxClass: 'h-7 w-[110px]' },
     md: { width: 145, height: 44, boxClass: 'h-9 w-[145px]' },
     lg: { width: 200, height: 60, boxClass: 'h-12 w-[200px]' },
-    xl: { width: 280, height: 84, boxClass: 'h-16 w-[260px] sm:w-[300px]' },
+    xl: { width: 280, height: 84, boxClass: 'h-16 w-[240px] sm:w-[290px]' },
   }[size];
 
   return (
@@ -25,7 +25,7 @@ export function BrandLogo({
     >
       <Image
         src="/images/brand/geesthart-logo.png"
-        alt="GEESTHART — Own your path"
+        alt="GEESTHART Bandung"
         width={dimensions.width * 2}
         height={dimensions.height * 2}
         priority
@@ -38,4 +38,3 @@ export function BrandLogo({
     </div>
   );
 }
-

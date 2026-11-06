@@ -2,187 +2,144 @@ import React from 'react';
 import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Trees, Building2, Compass, ShieldCheck, ArrowRight } from 'lucide-react';
+import { Trees, Building2, ArrowRight } from 'lucide-react';
 import { BrandLogo } from '@/components/BrandLogo';
 
 export const metadata: Metadata = {
-  title: 'Tentang Geesthart — Cerita Brand & Filosofi Own Your Path',
+  title: 'Tentang Geesthart: Cerita Brand & Konstruksi Pakaian Bandung',
   description:
-    'Kenali sejarah berdirinya Geesthart di Bandung sejak 2024, makna nama Geesthart, dan filosofi desain dua dunia: Hutan Pinus & Kota.',
+    'Kenali latar belakang berdirinya Geesthart di Bandung pada 2024, arti nama Geesthart, serta pemilihan bahan crinkle nylon dan taslan untuk medan hutan dan kota.',
 };
 
 export default function AboutPage() {
   return (
     <div>
       {/* Hero Banner */}
-      <section className="bg-white border-b border-[#E2E2DC] py-14 sm:py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-8 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-          <div className="lg:col-span-7 space-y-5">
-            <span className="inline-block px-3 py-1 bg-[#141517] text-white text-[11px] font-bold uppercase tracking-[0.2em]">
-              BANDUNG, INDONESIA // EST. 2024
+      <section className="bg-white border-b border-[#DCDCD4] py-10 sm:py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+          <div className="lg:col-span-7 space-y-4">
+            <span className="inline-block px-3 py-1 bg-[#141517] text-white text-[11px] font-bold uppercase tracking-[0.16em]">
+              Bandung, Jawa Barat • Berdiri 2024
             </span>
-            <h1 className="text-3xl sm:text-5xl font-extrabold uppercase tracking-tight text-[#141517] leading-[1.08]">
-              MENJEMBATANI HUTAN DAN JALANAN KOTA.
+            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold uppercase tracking-tight text-[#141517] leading-[1.08]">
+              Lahir dari Iklim Dataran Tinggi dan Jalanan Bandung.
             </h1>
-            <p className="text-sm sm:text-base text-neutral-600 leading-relaxed max-w-2xl">
-              Geesthart lahir pada tahun 2024 di Bandung—sebuah kota yang dikelilingi pegunungan dan hutan pinus, namun berdenyut dengan kultur jalanan (streetwear) yang kreatif dan dinamis.
+            <p className="text-xs sm:text-base text-[#4A4D52] leading-relaxed max-w-2xl">
+              Geesthart dimulai pada tahun 2024 di Bandung, kota yang dikelilingi jalur pegunungan dan hutan pinus namun bergerak cepat dengan aktivitas jalanan kota. Kami merancang pakaian yang nyaman dipakai di kedua tempat tersebut tanpa perlu berganti kostum.
             </p>
           </div>
-          <div className="lg:col-span-5 flex flex-col items-center justify-center p-8 bg-[#F7F7F4] border border-[#E2E2DC]">
+          <div className="lg:col-span-5 flex flex-col items-center justify-center p-6 sm:p-8 bg-[#F7F7F4] border border-[#DCDCD4]">
             <BrandLogo variant="dark" size="xl" />
-            <p className="mt-3 text-xs font-extrabold uppercase tracking-[0.3em] text-[#555D47]">
-              &ldquo;OWN YOUR PATH&rdquo;
+            <p className="mt-3 text-xs font-extrabold uppercase tracking-[0.26em] text-[#3F4734]">
+              Own Your Path
             </p>
           </div>
         </div>
       </section>
 
-      {/* Makna Nama & Filosofi */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-8 py-16 sm:py-24">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-          <div className="lg:col-span-5 space-y-6">
+      {/* Makna Nama & Dua Medan */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-8 py-12 sm:py-20">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
+          <div className="lg:col-span-5 space-y-5">
             <div>
-              <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#555D47]">
-                ETYMOLOGY &amp; IDENTITY
-              </span>
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#3F4734]">
+                Asal Kata &amp; Identitas
+              </p>
               <h2 className="text-2xl sm:text-3xl font-extrabold uppercase tracking-tight text-[#141517] mt-1">
-                MAKNA NAMA GEESTHART
+                Arti Nama Geesthart
               </h2>
             </div>
 
-            <div className="bg-white border border-[#E2E2DC] p-6 space-y-4">
-              <div className="pb-4 border-b border-[#EFEFEA]">
-                <span className="text-xs font-mono uppercase tracking-widest text-[#555D47]">
-                  01 // GEEST (SPIRIT / SOUL)
+            <div className="bg-white border border-[#DCDCD4] p-5 sm:p-6 space-y-5">
+              <div className="pb-5 border-b border-[#EFEFEA]">
+                <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#3F4734]">
+                  01. Geest (Jiwa / Semangat)
                 </span>
-                <p className="text-sm font-bold text-[#141517] mt-1">
-                  Jiwa Eksplorasi Tanpa Batas
-                </p>
-                <p className="text-xs text-neutral-600 mt-1 leading-relaxed">
-                  Melambangkan semangat kebebasan untuk terus bergerak, menjelajah jalur baru, dan tidak terpaku pada satu medan saja.
+                <h3 className="text-sm font-extrabold text-[#141517] mt-1">
+                  Dorongan untuk Menjelajah
+                </h3>
+                <p className="text-xs text-[#4A4D52] mt-1 leading-relaxed">
+                  Mewakili kemauan untuk keluar mencari jalur baru, baik saat menembus kabut pagi di Bandung Utara maupun menjalani kesibukan harian di tengah kota.
                 </p>
               </div>
 
               <div>
-                <span className="text-xs font-mono uppercase tracking-widest text-[#283A66]">
-                  02 // HART (HEART / RESILIENCE)
+                <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#1D2B4D]">
+                  02. Hart (Inti / Ketahanan)
                 </span>
-                <p className="text-sm font-bold text-[#141517] mt-1">
-                  Inti Ketangguhan &amp; Keberanian
-                </p>
-                <p className="text-xs text-neutral-600 mt-1 leading-relaxed">
-                  Melambangkan daya tahan material serta keteguhan hati pemakainya dalam menentukan jalannya sendiri—<em>&ldquo;Own your path&rdquo;</em>.
+                <h3 className="text-sm font-extrabold text-[#141517] mt-1">
+                  Daya Tahan Pakaian &amp; Pemakainya
+                </h3>
+                <p className="text-xs text-[#4A4D52] mt-1 leading-relaxed">
+                  Melambangkan kekuatan jahitan, pilihan kain nilon yang awet, serta keberanian menentukan langkah sendiri sesuai semboyan <em>Own your path</em>.
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div className="bg-white border border-[#E2E2DC] p-4">
+          <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
+            <div className="bg-white border border-[#DCDCD4] p-4">
               <div className="relative aspect-[4/5] w-full bg-[#EFEFEA] overflow-hidden mb-4">
                 <Image
                   src="/images/products/nimble-x-jacket-green-olive.jpg"
-                  alt="Geesthart di Hutan Pinus"
+                  alt="Pemakaian jaket Geesthart di Hutan Pinus Bandung"
                   fill
+                  sizes="(max-width: 640px) 100vw, 33vw"
                   className="object-cover"
                 />
               </div>
-              <div className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-[#555D47]">
-                <Trees className="w-4 h-4" />
-                <span>Dunia Pertama: Hutan (Outdoor)</span>
+              <div className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-[#3F4734]">
+                <Trees className="w-4 h-4 shrink-0" aria-hidden="true" />
+                <span>Medan Pertama: Hutan Pinus</span>
               </div>
-              <p className="text-xs text-neutral-600 mt-1.5 leading-relaxed">
-                Diuji di bawah kanopi pinus Bandung Utara. Mengutamakan ketahanan angin, bobot ringan, dan saku fungsional yang mudah dijangkau.
+              <p className="text-xs text-[#4A4D52] mt-1.5 leading-relaxed">
+                Mengutamakan perlindungan terhadap angin lembap, bobot kain yang ringan di pundak, serta 6 saku berpenutup untuk menyimpan barang penting.
               </p>
             </div>
 
-            <div className="bg-white border border-[#E2E2DC] p-4">
+            <div className="bg-white border border-[#DCDCD4] p-4">
               <div className="relative aspect-[4/5] w-full bg-[#EFEFEA] overflow-hidden mb-4">
                 <Image
                   src="/images/products/litefield-pants-olive-1.jpg"
-                  alt="Geesthart di Perkotaan"
+                  alt="Pemakaian celana panjang Geesthart di jalanan kota"
                   fill
+                  sizes="(max-width: 640px) 100vw, 33vw"
                   className="object-cover"
                 />
               </div>
-              <div className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-[#283A66]">
-                <Building2 className="w-4 h-4" />
-                <span>Dunia Kedua: Kota (Urban)</span>
+              <div className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-[#141517]">
+                <Building2 className="w-4 h-4 shrink-0" aria-hidden="true" />
+                <span>Medan Kedua: Jalanan Kota</span>
               </div>
-              <p className="text-xs text-neutral-600 mt-1.5 leading-relaxed">
-                Dirancang dengan siluet gorpcore modern agar tetap tajam dan relevan saat dipakai di kafe, studio, lapangan padel, maupun jalan raya kota.
+              <p className="text-xs text-[#4A4D52] mt-1.5 leading-relaxed">
+                Potongan boxy pada jaket dan pipa loose-straight pada celana memberi proporsi rapi untuk berkendara, bekerja, maupun berolahraga di lapangan.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Proses & Standar Kualitas */}
-      <section className="bg-white border-t border-[#E2E2DC] py-16 sm:py-24">
+      {/* Standar Konstruksi & CTA */}
+      <section className="bg-white border-t border-[#DCDCD4] py-12 sm:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-8">
-          <div className="max-w-2xl mb-12">
-            <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#555D47]">
-              CRAFTED IN BANDUNG // PROCESS
-            </span>
-            <h2 className="text-2xl sm:text-4xl font-extrabold uppercase tracking-tight text-[#141517] mt-1">
-              STANDAR DESAIN &amp; PRODUKSI
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-6 bg-[#F7F7F4] border border-[#E2E2DC] space-y-3">
-              <span className="text-xs font-mono font-bold text-[#555D47]">
-                STEP 01 // MATERIAL CURATION
-              </span>
-              <h3 className="text-base font-extrabold uppercase text-[#141517]">
-                Pemilihan Kain Teknis
-              </h3>
-              <p className="text-xs text-neutral-600 leading-relaxed">
-                Kami memilih kain crinkle parachute nylon dan taslan bergramasi ringan yang sejuk di kulit tropis Indonesia namun tetap memiliki struktur jatuh yang tegas.
+          <div className="p-6 sm:p-10 bg-[#141517] text-white flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+            <div className="max-w-xl">
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#B8CCA0] mb-1">
+                Katalog &amp; Tabel Ukuran Resmi
               </p>
-            </div>
-
-            <div className="p-6 bg-[#F7F7F4] border border-[#E2E2DC] space-y-3">
-              <span className="text-xs font-mono font-bold text-[#283A66]">
-                STEP 02 // ERGONOMIC PATTERNING
-              </span>
-              <h3 className="text-base font-extrabold uppercase text-[#141517]">
-                Pola Gerak Bebas
-              </h3>
-              <p className="text-xs text-neutral-600 leading-relaxed">
-                Setiap potongan jaket, trackpants, dan skort memperhitungkan ruang gerak tubuh saat melangkah lebar, mengayun raket, maupun berkendara roda dua.
-              </p>
-            </div>
-
-            <div className="p-6 bg-[#F7F7F4] border border-[#E2E2DC] space-y-3">
-              <span className="text-xs font-mono font-bold text-[#141517]">
-                STEP 03 // HARDWARE &amp; FINISHING
-              </span>
-              <h3 className="text-base font-extrabold uppercase text-[#141517]">
-                Detail Stopper &amp; Jahitan
-              </h3>
-              <p className="text-xs text-neutral-600 leading-relaxed">
-                Dilengkapi cord stopper di tudung kepala dan bukaan kaki celana, snap button kokoh, serta woven rubber patch GH yang menjadi identitas keaslian.
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-12 p-8 bg-[#141517] text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-            <div>
-              <h3 className="text-xl font-extrabold uppercase tracking-tight">
-                Siap Menemukan Gear Geesthart Anda?
-              </h3>
-              <p className="text-xs text-neutral-300 mt-1">
-                Jelajahi koleksi Nimble X, Litefield, dan Fieldlite di halaman katalog resmi kami.
+              <h2 className="text-xl sm:text-3xl font-extrabold uppercase tracking-tight">
+                Lihat Spesifikasi Lengkap Tiap Artikel
+              </h2>
+              <p className="text-xs sm:text-sm text-neutral-300 mt-1.5 leading-relaxed">
+                Bandingkan ukuran lebar dada, lebar pinggang, dan panjang celana secara akurat di halaman katalog kami.
               </p>
             </div>
             <Link
               href="/catalog"
-              className="px-6 py-3.5 bg-[#555D47] hover:bg-[#677156] text-white text-xs font-extrabold uppercase tracking-[0.16em] transition-colors inline-flex items-center gap-2 shrink-0"
+              className="min-h-[48px] px-6 py-3 bg-[#3F4734] hover:bg-[#4F5942] text-white text-xs font-extrabold uppercase tracking-[0.14em] transition-colors inline-flex items-center gap-2 shrink-0"
             >
-              <Compass className="w-4 h-4" />
-              <span>Buka Katalog</span>
-              <ArrowRight className="w-4 h-4" />
+              <span>Buka Katalog Geesthart</span>
+              <ArrowRight className="w-4 h-4" aria-hidden="true" />
             </Link>
           </div>
         </div>
@@ -190,4 +147,3 @@ export default function AboutPage() {
     </div>
   );
 }
-

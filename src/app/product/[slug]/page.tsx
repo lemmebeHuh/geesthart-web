@@ -28,11 +28,11 @@ export async function generateMetadata({
 
   return {
     title: `${product.name} (${product.collection})`,
-    description: `${product.shortDescription} — Harga ${formatRupiah(
+    description: `${product.shortDescription} Harga ${formatRupiah(
       product.price
-    )}. Cek tabel ukuran lengkap dan beli di marketplace resmi Geesthart.`,
+    )}. Cek tabel ukuran lengkap dan pesan lewat toko resmi Geesthart.`,
     openGraph: {
-      title: `${product.name} | GEESTHART`,
+      title: `${product.name} | GEESTHART BANDUNG`,
       description: product.shortDescription,
       images: [product.mainImage],
     },
@@ -53,30 +53,30 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
     .slice(0, 3);
 
   return (
-    <div>
+    <div className="pb-24 lg:pb-0">
       <ProductDetailClient product={product} />
 
       {/* Related Products Section */}
-      <section className="border-t border-[#E2E2DC] bg-white py-14 sm:py-20 mt-8">
+      <section className="border-t border-[#DCDCD4] bg-white py-12 sm:py-20 mt-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-8">
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-6 sm:mb-8">
             <div>
-              <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#555D47]">
-                COMPLETE YOUR GEAR
-              </span>
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#3F4734]">
+                Koleksi Lainnya
+              </p>
               <h2 className="text-xl sm:text-2xl font-extrabold uppercase tracking-tight text-[#141517] mt-1">
-                PRODUK LAINNYA DARI GEESTHART
+                Artikel Geesthart Lainnya
               </h2>
             </div>
             <Link
               href="/catalog"
-              className="text-xs font-bold uppercase tracking-[0.14em] text-[#141517] hover:text-[#555D47] underline"
+              className="min-h-[44px] inline-flex items-center text-xs font-bold uppercase tracking-[0.14em] text-[#141517] hover:text-[#3F4734] underline"
             >
-              Semua Katalog
+              Lihat Semua Katalog
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
             {relatedProducts.map((rel) => (
               <ProductCard key={rel.id} product={rel} />
             ))}
@@ -86,4 +86,3 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
     </div>
   );
 }
-

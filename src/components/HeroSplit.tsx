@@ -3,146 +3,152 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Trees, Building2, ArrowRight, Compass, Layers } from 'lucide-react';
+import { Trees, Building2, ArrowRight } from 'lucide-react';
 import { BrandLogo } from './BrandLogo';
 
 type ActiveRealm = 'neutral' | 'forest' | 'city';
+type MobileTab = 'forest' | 'city';
 
 export function HeroSplit() {
   const [activeRealm, setActiveRealm] = useState<ActiveRealm>('neutral');
+  const [mobileTab, setMobileTab] = useState<MobileTab>('forest');
 
-  // Calculate flex width proportions based on hover/selection
   const forestBasis =
     activeRealm === 'forest'
-      ? 'lg:w-[64%]'
+      ? 'lg:w-[62%]'
       : activeRealm === 'city'
-      ? 'lg:w-[36%]'
+      ? 'lg:w-[38%]'
       : 'lg:w-1/2';
 
   const cityBasis =
     activeRealm === 'city'
-      ? 'lg:w-[64%]'
+      ? 'lg:w-[62%]'
       : activeRealm === 'forest'
-      ? 'lg:w-[36%]'
+      ? 'lg:w-[38%]'
       : 'lg:w-1/2';
 
   return (
-    <section className="relative w-full border-b border-[#E2E2DC] bg-[#141517] overflow-hidden">
-      {/* Mobile Realm Switcher Control */}
-      <div className="lg:hidden bg-[#141517] border-b border-neutral-800 px-4 py-2.5 flex items-center justify-between">
-        <span className="text-[10px] uppercase tracking-[0.18em] text-neutral-400">
-          REALM VIEW:
-        </span>
-        <div className="inline-flex border border-neutral-700 bg-neutral-900 p-0.5">
-          <button
-            type="button"
-            onClick={() => setActiveRealm('forest')}
-            className={`px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider transition-colors ${
-              activeRealm === 'forest'
-                ? 'bg-[#555D47] text-white'
-                : 'text-neutral-400'
-            }`}
+    <section
+      aria-label="Dua Medan Geesthart: Hutan Pinus dan Jalanan Kota"
+      className="relative w-full border-b border-[#DCDCD4] bg-[#141517] overflow-hidden"
+    >
+      {/* MOBILE & TABLET INTRO HEADER (< lg): Reflowed first so mobile users immediately see brand identity & CTAs */}
+      <div className="lg:hidden bg-[#F7F7F4] border-b border-[#DCDCD4] px-4 sm:px-8 py-6">
+        <div className="max-w-xl mx-auto">
+          <div className="flex items-center justify-between gap-4">
+            <BrandLogo variant="dark" size="md" />
+            <span className="text-[11px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 bg-[#EFEFEA] text-[#3F4734] border border-[#DCDCD4]">
+              Bandung • Est. 2024
+            </span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold uppercase tracking-tight text-[#141517] mt-3 leading-tight">
+            Own Your Path: Dari Kanopi Hutan ke Aspal Kota.
+          </h1>
+          <p className="text-xs sm:text-sm text-[#4A4D52] mt-2 leading-relaxed">
+            Pakaian luar ruang dan streetwear teknis yang diuji di dua medan Bandung. Pilih medan di bawah untuk melihat seri koleksi yang sesuai.
+          </p>
+
+          {/* Mobile 2-Button Realm Switcher (>= 44px touch targets, md tablet shows both side-by-side) */}
+          <div
+            role="tablist"
+            aria-label="Pilih medan pemakaian"
+            className="mt-4 grid grid-cols-2 gap-2 md:hidden"
           >
-            01. Forest
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveRealm('neutral')}
-            className={`px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider transition-colors ${
-              activeRealm === 'neutral'
-                ? 'bg-white text-[#141517]'
-                : 'text-neutral-400'
-            }`}
-          >
-            50:50
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveRealm('city')}
-            className={`px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider transition-colors ${
-              activeRealm === 'city'
-                ? 'bg-[#283A66] text-white'
-                : 'text-neutral-400'
-            }`}
-          >
-            02. City
-          </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={mobileTab === 'forest'}
+              onClick={() => setMobileTab('forest')}
+              className={`min-h-[44px] px-3 py-2 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 border transition-colors ${
+                mobileTab === 'forest'
+                  ? 'bg-[#3F4734] text-white border-[#3F4734]'
+                  : 'bg-white text-[#141517] border-[#C8C8C0]'
+              }`}
+            >
+              <Trees className="w-4 h-4 shrink-0" aria-hidden="true" />
+              <span>01. Hutan Pinus</span>
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={mobileTab === 'city'}
+              onClick={() => setMobileTab('city')}
+              className={`min-h-[44px] px-3 py-2 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 border transition-colors ${
+                mobileTab === 'city'
+                  ? 'bg-[#141517] text-white border-[#141517]'
+                  : 'bg-white text-[#141517] border-[#C8C8C0]'
+              }`}
+            >
+              <Building2 className="w-4 h-4 shrink-0" aria-hidden="true" />
+              <span>02. Jalan Kota</span>
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Main Split Container */}
+      {/* MAIN SPLIT CONTAINER:
+          - Mobile (< md): single active tab panel (compact 420px height, no giant vertical stack)
+          - Tablet (md to lg): 2 equal columns side by side
+          - Desktop (lg+): interactive hover/focus expanding 50:50 -> 62:38 split */}
       <div
-        className="relative flex flex-col lg:flex-row w-full min-h-[680px] lg:h-[84vh] lg:max-h-[860px]"
+        className="relative flex flex-col md:grid md:grid-cols-2 lg:flex lg:flex-row w-full lg:min-h-[640px] lg:h-[78dvh] lg:max-h-[820px]"
         onMouseLeave={() => setActiveRealm('neutral')}
       >
         {/* LEFT REALM: PINE FOREST (OUTDOOR) */}
         <div
           onMouseEnter={() => setActiveRealm('forest')}
-          onClick={() => setActiveRealm('forest')}
+          onFocusCapture={() => setActiveRealm('forest')}
           className={`relative w-full ${forestBasis} ${
-            activeRealm === 'city'
-              ? 'min-h-[260px] lg:min-h-full'
-              : 'min-h-[380px] lg:min-h-full'
-          } transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] overflow-hidden group cursor-pointer border-b lg:border-b-0 lg:border-r border-white/15`}
+            mobileTab === 'forest' ? 'block' : 'hidden md:block'
+          } min-h-[400px] sm:min-h-[440px] lg:min-h-full transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] overflow-hidden group md:border-r border-white/15`}
         >
           <Image
             src="/images/products/nimble-x-jacket-green-olive.jpg"
-            alt="Geesthart Outdoor Forest — Fieldcore Nimble X Series in Pine Woods"
+            alt="Model mengenakan Fieldcore Jacket Nimble X Series warna Green Olive di hutan pinus Bandung"
             fill
             priority
-            sizes="(max-width: 1024px) 100vw, 65vw"
+            fetchPriority="high"
+            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 62vw"
             className="object-cover object-center transition-transform duration-1000 ease-out group-hover:scale-105"
           />
-          {/* Gradient Overlay */}
-          <div
-            className={`absolute inset-0 transition-opacity duration-500 ${
-              activeRealm === 'forest'
-                ? 'bg-gradient-to-t from-black/80 via-black/25 to-black/30'
-                : 'bg-gradient-to-t from-black/85 via-black/45 to-black/40'
-            }`}
-          />
+          {/* High-contrast scrim for WCAG AA text legibility (R-25) */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/45 to-black/35" />
 
-          {/* Top Left Coordinates & Tag */}
-          <div className="absolute top-6 left-6 right-6 flex items-center justify-between text-white/90 z-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-black/55 backdrop-blur-xs border border-white/15 text-[11px] font-bold uppercase tracking-[0.18em]">
-              <Trees className="w-3.5 h-3.5 text-[#A5B88C]" />
-              <span>REALM 01 // PINE FOREST</span>
-            </div>
-            <span className="hidden sm:inline-block text-[10px] font-mono tracking-[0.16em] text-white/75 bg-black/40 px-2.5 py-1">
-              06°48&apos;S 107°36&apos;E • HIGHLAND WOODS
+          {/* Top Coordinates & Tag */}
+          <div className="absolute top-4 sm:top-6 left-4 sm:left-6 right-4 sm:right-6 flex items-center justify-between text-white z-10">
+            <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#141517]/90 border border-white/20 text-[11px] font-bold uppercase tracking-[0.14em]">
+              <Trees className="w-3.5 h-3.5 text-[#B8CCA0]" aria-hidden="true" />
+              <span>Medan 01: Hutan Pinus</span>
+            </span>
+            <span className="hidden sm:inline-block text-[11px] font-mono tracking-wider text-white bg-[#141517]/85 px-2.5 py-1">
+              06°48&apos;LS 107°36&apos;BT
             </span>
           </div>
 
-          {/* Bottom Left Content */}
-          <div className="absolute bottom-7 left-6 right-6 sm:left-8 sm:right-8 z-10 text-white max-w-md">
-            <span className="inline-block text-[10px] font-bold uppercase tracking-[0.22em] text-[#B8CCA0] mb-1.5">
-              OUTDOOR TECHNICAL SERIES
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold uppercase tracking-tight leading-tight">
-              INTO THE HIGHLAND CANOPY.
-            </h2>
-            <p
-              className={`text-xs sm:text-sm text-neutral-200 mt-2 leading-relaxed transition-all duration-500 ${
-                activeRealm === 'city' ? 'lg:opacity-60 lg:line-clamp-1' : 'opacity-100'
-              }`}
-            >
-              Jaket parachute windproof dengan 6 saku fungsional dan konstruksi tahan cuaca lembap hutan pinus Bandung.
+          {/* Bottom Content Card */}
+          <div className="absolute bottom-5 sm:bottom-8 left-4 sm:left-8 right-4 sm:right-8 z-10 text-white max-w-md">
+            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#B8CCA0] mb-1">
+              Seri Nimble X • Pakaian Luar Ruang
             </p>
-            <div className="mt-4 flex flex-wrap items-center gap-3">
+            <h2 className="text-2xl sm:text-3xl font-extrabold uppercase tracking-tight leading-tight">
+              Tahan Angin di Bawah Kanopi Pinus.
+            </h2>
+            <p className="text-xs sm:text-sm text-neutral-200 mt-2 leading-relaxed">
+              Jaket parachute crinkle dengan 6 saku penyimpanan dan tudung storm hood untuk menahan udara lembap dataran tinggi.
+            </p>
+            <div className="mt-4 flex flex-wrap items-center gap-2.5">
               <Link
                 href="/catalog?collection=Nimble+X"
-                onClick={(e) => e.stopPropagation()}
-                className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#555D47] hover:bg-[#667056] text-white text-[11px] font-bold uppercase tracking-[0.15em] transition-colors"
+                className="min-h-[44px] inline-flex items-center gap-2 px-4 py-2.5 bg-[#3F4734] hover:bg-[#4F5942] active:bg-[#2F3627] text-white text-xs font-bold uppercase tracking-[0.12em] transition-colors"
               >
-                <span>Explore Nimble X</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <span>Lihat Seri Nimble X</span>
+                <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
               </Link>
               <Link
                 href="/product/fieldcore-jacket-nimble-x-series"
-                onClick={(e) => e.stopPropagation()}
-                className="inline-flex items-center gap-1.5 px-3 py-2.5 bg-black/50 hover:bg-black/75 border border-white/25 text-white text-[11px] font-semibold uppercase tracking-[0.12em] transition-colors"
+                className="min-h-[44px] inline-flex items-center px-3.5 py-2.5 bg-[#141517]/90 hover:bg-[#141517] border border-white/30 text-white text-xs font-bold uppercase tracking-[0.1em] transition-colors"
               >
-                <span>Lihat Fieldcore Jacket</span>
+                <span>Detail Jaket</span>
               </Link>
             </div>
           </div>
@@ -151,102 +157,88 @@ export function HeroSplit() {
         {/* RIGHT REALM: URBAN STREET (CITY) */}
         <div
           onMouseEnter={() => setActiveRealm('city')}
-          onClick={() => setActiveRealm('city')}
+          onFocusCapture={() => setActiveRealm('city')}
           className={`relative w-full ${cityBasis} ${
-            activeRealm === 'forest'
-              ? 'min-h-[260px] lg:min-h-full'
-              : 'min-h-[380px] lg:min-h-full'
-          } transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] overflow-hidden group cursor-pointer`}
+            mobileTab === 'city' ? 'block' : 'hidden md:block'
+          } min-h-[400px] sm:min-h-[440px] lg:min-h-full transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] overflow-hidden group`}
         >
           <Image
             src="/images/products/litefield-pants-black-1.jpg"
-            alt="Geesthart Urban Streetwear — Litefield Trackpants in Bandung City"
+            alt="Model mengenakan Geesthart Litefield Trackpants warna Black di jalanan kota Bandung"
             fill
             priority
-            sizes="(max-width: 1024px) 100vw, 65vw"
+            fetchPriority="high"
+            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 62vw"
             className="object-cover object-center transition-transform duration-1000 ease-out group-hover:scale-105"
           />
-          {/* Gradient Overlay */}
-          <div
-            className={`absolute inset-0 transition-opacity duration-500 ${
-              activeRealm === 'city'
-                ? 'bg-gradient-to-t from-black/80 via-black/25 to-black/30'
-                : 'bg-gradient-to-t from-black/85 via-black/45 to-black/40'
-            }`}
-          />
+          {/* High-contrast scrim for WCAG AA text legibility (R-25) */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/45 to-black/35" />
 
-          {/* Top Right Coordinates & Tag */}
-          <div className="absolute top-6 left-6 right-6 flex items-center justify-between text-white/90 z-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-black/55 backdrop-blur-xs border border-white/15 text-[11px] font-bold uppercase tracking-[0.18em]">
-              <Building2 className="w-3.5 h-3.5 text-[#8CA6DB]" />
-              <span>REALM 02 // URBAN GRID</span>
-            </div>
-            <span className="hidden sm:inline-block text-[10px] font-mono tracking-[0.16em] text-white/75 bg-black/40 px-2.5 py-1">
-              06°54&apos;S 107°36&apos;E • BANDUNG STREET
+          {/* Top Coordinates & Tag */}
+          <div className="absolute top-4 sm:top-6 left-4 sm:left-6 right-4 sm:right-6 flex items-center justify-between text-white z-10">
+            <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#141517]/90 border border-white/20 text-[11px] font-bold uppercase tracking-[0.14em]">
+              <Building2 className="w-3.5 h-3.5 text-[#B8CCA0]" aria-hidden="true" />
+              <span>Medan 02: Jalanan Kota</span>
+            </span>
+            <span className="hidden sm:inline-block text-[11px] font-mono tracking-wider text-white bg-[#141517]/85 px-2.5 py-1">
+              06°54&apos;LS 107°36&apos;BT
             </span>
           </div>
 
-          {/* Bottom Right Content */}
-          <div className="absolute bottom-7 left-6 right-6 sm:left-8 sm:right-8 z-10 text-white max-w-md">
-            <span className="inline-block text-[10px] font-bold uppercase tracking-[0.22em] text-[#9EB7E5] mb-1.5">
-              DAILY URBAN UTILITY
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold uppercase tracking-tight leading-tight">
-              BUILT FOR CONCRETE MOTION.
-            </h2>
-            <p
-              className={`text-xs sm:text-sm text-neutral-200 mt-2 leading-relaxed transition-all duration-500 ${
-                activeRealm === 'forest' ? 'lg:opacity-60 lg:line-clamp-1' : 'opacity-100'
-              }`}
-            >
-              Trackpants &amp; active skort bersiluet gorpcore modern untuk mobilitas harian dari jalanan aspal hingga lapangan aktif.
+          {/* Bottom Content Card */}
+          <div className="absolute bottom-5 sm:bottom-8 left-4 sm:left-8 right-4 sm:right-8 z-10 text-white max-w-md">
+            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#B8CCA0] mb-1">
+              Seri Litefield • Utilitas Harian Kota
             </p>
-            <div className="mt-4 flex flex-wrap items-center gap-3">
+            <h2 className="text-2xl sm:text-3xl font-extrabold uppercase tracking-tight leading-tight">
+              Potongan Longgar untuk Gerak Harian.
+            </h2>
+            <p className="text-xs sm:text-sm text-neutral-200 mt-2 leading-relaxed">
+              Trackpants unisex dengan stopper di mata kaki dan active skort wanita yang nyaman dipakai dari jalan raya hingga lapangan padel.
+            </p>
+            <div className="mt-4 flex flex-wrap items-center gap-2.5">
               <Link
                 href="/catalog?collection=Litefield"
-                onClick={(e) => e.stopPropagation()}
-                className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#283A66] hover:bg-[#32487E] text-white text-[11px] font-bold uppercase tracking-[0.15em] transition-colors"
+                className="min-h-[44px] inline-flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-[#EFEFEA] text-[#141517] text-xs font-extrabold uppercase tracking-[0.12em] transition-colors"
               >
-                <span>Explore Litefield</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <span>Lihat Seri Litefield</span>
+                <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
               </Link>
               <Link
                 href="/product/geesthart-litefield-trackpants"
-                onClick={(e) => e.stopPropagation()}
-                className="inline-flex items-center gap-1.5 px-3 py-2.5 bg-black/50 hover:bg-black/75 border border-white/25 text-white text-[11px] font-semibold uppercase tracking-[0.12em] transition-colors"
+                className="min-h-[44px] inline-flex items-center px-3.5 py-2.5 bg-[#141517]/90 hover:bg-[#141517] border border-white/30 text-white text-xs font-bold uppercase tracking-[0.1em] transition-colors"
               >
-                <span>Lihat Trackpants</span>
+                <span>Detail Trackpants</span>
               </Link>
             </div>
           </div>
         </div>
 
-        {/* CENTER FLOATING BRAND STATEMENT BADGE (Desktop & Tablet) */}
-        <div className="lg:absolute lg:top-1/2 lg:left-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2 z-20 pointer-events-none flex items-center justify-center p-4 bg-[#F7F7F4] lg:bg-[#F7F7F4]/95 lg:backdrop-blur-md border-y lg:border border-[#141517] shadow-2xl">
-          <div className="pointer-events-auto text-center px-4 py-3 sm:px-7 sm:py-5 max-w-xs sm:max-w-sm">
+        {/* DESKTOP CENTER FLOATING IDENTITY CARD (lg+ only) */}
+        <div className="hidden lg:flex lg:
+          absolute lg:top-1/2 lg:left-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2 z-20 pointer-events-none items-center justify-center p-5 bg-[#F7F7F4] border-2 border-[#141517] shadow-2xl">
+          <div className="pointer-events-auto text-center px-6 py-4 max-w-xs">
             <div className="flex justify-center mb-1">
               <BrandLogo variant="dark" size="lg" />
             </div>
-            <p className="text-xs sm:text-sm font-extrabold uppercase tracking-[0.28em] text-[#141517] mt-1">
-              &ldquo;OWN YOUR PATH&rdquo;
-            </p>
-            <p className="text-[11px] text-neutral-600 mt-1.5 leading-relaxed">
-              Dua dunia dalam satu identitas. Hover sisi kiri untuk Hutan Pinus, atau sisi kanan untuk Kota Bandung.
+            <h1 className="text-xs font-extrabold uppercase tracking-[0.24em] text-[#141517] mt-1">
+              Own Your Path
+            </h1>
+            <p className="text-xs text-[#4A4D52] mt-1.5 leading-relaxed">
+              Arahkan kursor ke kiri untuk koleksi Hutan Pinus, atau ke kanan untuk koleksi Jalanan Kota Bandung.
             </p>
             <div className="mt-4 flex items-center justify-center gap-2">
               <Link
                 href="/catalog"
-                className="px-4 py-2 bg-[#141517] text-white text-[11px] font-bold uppercase tracking-[0.15em] hover:bg-[#555D47] transition-colors inline-flex items-center gap-1.5"
+                className="min-h-[44px] px-4 py-2 bg-[#141517] text-white text-xs font-bold uppercase tracking-[0.12em] hover:bg-[#3F4734] transition-colors inline-flex items-center"
               >
-                <Compass className="w-3.5 h-3.5" />
-                <span>Katalog Lengkap</span>
+                Semua Katalog
               </Link>
               <Link
                 href="/lookbook"
-                className="px-3.5 py-2 bg-white border border-[#141517] text-[#141517] text-[11px] font-bold uppercase tracking-[0.15em] hover:bg-neutral-100 transition-colors inline-flex items-center gap-1.5"
+                className="min-h-[44px] px-4 py-2 bg-white border border-[#141517] text-[#141517] text-xs font-bold uppercase tracking-[0.12em] hover:bg-[#EFEFEA] transition-colors inline-flex items-center"
               >
-                <Layers className="w-3.5 h-3.5" />
-                <span>Lookbook</span>
+                Lookbook
               </Link>
             </div>
           </div>
@@ -255,4 +247,3 @@ export function HeroSplit() {
     </section>
   );
 }
-

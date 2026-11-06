@@ -1,19 +1,11 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import {
-  ArrowRight,
-  ArrowUpRight,
-  Compass,
-  ShieldCheck,
-  Trees,
-  Building2,
-  Sparkles,
-} from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Ruler } from 'lucide-react';
 import { HeroSplit } from '@/components/HeroSplit';
 import { ProductCard } from '@/components/ProductCard';
+import { VideoReelCard } from '@/components/VideoReelCard';
 import { getLookbooks, getProducts } from '@/lib/data';
-import { SITE_CONFIG } from '@/data/seed-data';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -29,225 +21,248 @@ export default async function HomePage() {
       {/* 1. Interactive Split Hero: Forest vs City */}
       <HeroSplit />
 
-      {/* 2. Technical Brand Pillars Bar */}
-      <section className="bg-white border-b border-[#E2E2DC]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-8 py-6 grid grid-cols-1 md:grid-cols-3 gap-6 divide-y md:divide-y-0 md:divide-x divide-[#E2E2DC]">
-          <div className="flex items-start gap-3.5 pt-2 md:pt-0">
-            <div className="p-2.5 bg-[#F7F7F4] border border-[#E2E2DC] text-[#555D47]">
-              <Trees className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="text-xs font-extrabold uppercase tracking-[0.14em] text-[#141517]">
-                01 // Outdoor Ready Material
-              </h3>
-              <p className="text-xs text-neutral-500 mt-1 leading-relaxed">
-                Parachute crinkle &amp; taslan pilihan yang ringan, tahan angin, dan cepat kering di cuaca dataran tinggi.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-3.5 pt-4 md:pt-0 md:pl-6">
-            <div className="p-2.5 bg-[#F7F7F4] border border-[#E2E2DC] text-[#283A66]">
-              <Building2 className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="text-xs font-extrabold uppercase tracking-[0.14em] text-[#141517]">
-                02 // Urban Gorpcore Cut
-              </h3>
-              <p className="text-xs text-neutral-500 mt-1 leading-relaxed">
-                Potongan boxy dan loose-straight yang dirancang presisi untuk aktivitas harian di jalanan kota Bandung.
-              </p>
+      {/* 2. Asymmetric Material & Sizing Spec Section (Breaks uniform 3-card template per R-05 & R-14) */}
+      <section className="bg-white border-b border-[#DCDCD4] py-10 sm:py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+          <div className="lg:col-span-5 space-y-3">
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#3F4734]">
+              Standar Konstruksi Bandung
+            </p>
+            <h2 className="text-2xl sm:text-3xl font-extrabold uppercase tracking-tight text-[#141517] leading-tight">
+              Dibuat untuk Cuaca Lembap Hutan dan Gerak Cepat di Kota.
+            </h2>
+            <p className="text-xs sm:text-sm text-[#4A4D52] leading-relaxed">
+              Setiap jaket, trackpants, dan skort Geesthart dirancang berdasarkan ukuran tubuh dan iklim tropis dataran tinggi. Cek detail potongan dan tabel ukuran dalam satuan sentimeter sebelum memesan.
+            </p>
+            <div className="pt-2">
+              <Link
+                href="/catalog"
+                className="min-h-[44px] inline-flex items-center gap-2 px-4 py-2.5 bg-[#F7F7F4] border border-[#141517] text-xs font-bold uppercase tracking-wider text-[#141517] hover:bg-[#141517] hover:text-white transition-colors"
+              >
+                <Ruler className="w-4 h-4" aria-hidden="true" />
+                <span>Cek Filter Lebar Pinggang &amp; Ukuran</span>
+              </Link>
             </div>
           </div>
 
-          <div className="flex items-start gap-3.5 pt-4 md:pt-0 md:pl-6">
-            <div className="p-2.5 bg-[#F7F7F4] border border-[#E2E2DC] text-[#141517]">
-              <ShieldCheck className="w-5 h-5" />
+          <dl className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="p-4 sm:p-5 bg-[#F7F7F4] border border-[#DCDCD4]">
+              <dt className="text-xs font-extrabold uppercase tracking-wider text-[#141517]">
+                01. Parachute Crinkle &amp; Taslan
+              </dt>
+              <dd className="text-xs text-[#4A4D52] mt-1.5 leading-relaxed">
+                Kain nilon bertekstur crinkle yang ringan di badan, menahan angin dingin, dan cepat kering setelah terkena gerimis.
+              </dd>
             </div>
-            <div>
-              <h3 className="text-xs font-extrabold uppercase tracking-[0.14em] text-[#141517]">
-                03 // Official Marketplace Checkout
-              </h3>
-              <p className="text-xs text-neutral-500 mt-1 leading-relaxed">
-                Bandingkan size chart secara akurat di web, lalu checkout aman via Shopee, TikTok Shop, atau WhatsApp CS.
-              </p>
+
+            <div className="p-4 sm:p-5 bg-[#F7F7F4] border border-[#DCDCD4]">
+              <dt className="text-xs font-extrabold uppercase tracking-wider text-[#141517]">
+                02. Potongan Boxy &amp; Loose-Straight
+              </dt>
+              <dd className="text-xs text-[#4A4D52] mt-1.5 leading-relaxed">
+                Jaket berpotongan boxy (lebar dada 56 s/d 64 cm) dan trackpants berpipa lega dengan tali serut stopper di mata kaki.
+              </dd>
             </div>
-          </div>
+
+            <div className="p-4 sm:p-5 bg-[#F7F7F4] border border-[#DCDCD4]">
+              <dt className="text-xs font-extrabold uppercase tracking-wider text-[#141517]">
+                03. Panduan Ukuran Spesifik per Kategori
+              </dt>
+              <dd className="text-xs text-[#4A4D52] mt-1.5 leading-relaxed">
+                Tabel ukuran terpisah untuk jaket unisex, celana panjang trackpants, serta celana pendek dan skort wanita.
+              </dd>
+            </div>
+
+            <div className="p-4 sm:p-5 bg-[#F7F7F4] border border-[#DCDCD4]">
+              <dt className="text-xs font-extrabold uppercase tracking-wider text-[#141517]">
+                04. Pesan Lewat Toko Resmi
+              </dt>
+              <dd className="text-xs text-[#4A4D52] mt-1.5 leading-relaxed">
+                Pilih warna dan ukuran di web ini, lalu lanjutkan transaksi melalui Shopee Official, TikTok Shop, atau WhatsApp Admin Bandung.
+              </dd>
+            </div>
+          </dl>
         </div>
       </section>
 
-      {/* 3. Latest Drop / Featured Catalog */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-8 py-16 sm:py-24">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-8 border-b border-[#E2E2DC]">
+      {/* 3. Featured Catalog (3-state responsive grid: 1 col mobile -> 2 col tablet -> 4 col desktop) */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-8 py-12 sm:py-20">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-6 border-b border-[#DCDCD4]">
           <div>
-            <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#555D47]">
-              CURATED CATALOG // DROP TERBARU
-            </span>
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#3F4734]">
+              Katalog Rilisan Aktif
+            </p>
             <h2 className="text-2xl sm:text-4xl font-extrabold uppercase tracking-tight text-[#141517] mt-1">
-              ESSENTIAL TECHNICAL GEAR
+              Koleksi Pilihan Geesthart
             </h2>
           </div>
           <Link
             href="/catalog"
-            className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.16em] text-[#141517] hover:text-[#555D47] transition-colors"
+            className="min-h-[44px] inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.14em] text-[#141517] hover:text-[#3F4734] transition-colors"
           >
-            <span>Lihat Semua Katalog ({products.length})</span>
-            <ArrowRight className="w-4 h-4" />
+            <span>Lihat Seluruh Katalog ({products.length} Produk)</span>
+            <ArrowRight className="w-4 h-4" aria-hidden="true" />
           </Link>
         </div>
 
-        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="mt-6 sm:mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
           {featuredProducts.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
       </section>
 
-      {/* 4. Three Collections Matrix (Nimble X, Litefield, Fieldlite) */}
-      <section className="bg-white border-y border-[#E2E2DC] py-16 sm:py-24">
+      {/* 4. Asymmetric Collection Hierarchy (R-14: Flagship Nimble X gets 7 cols, Litefield & Fieldlite stack in 5 cols) */}
+      <section className="bg-white border-y border-[#DCDCD4] py-12 sm:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-8">
-          <div className="max-w-2xl mb-10">
-            <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#283A66]">
-              GEESTHART ARCHIVE // SERI KOLEKSI
-            </span>
+          <div className="max-w-2xl mb-8 sm:mb-10">
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#3F4734]">
+              Tiga Seri Koleksi
+            </p>
             <h2 className="text-2xl sm:text-4xl font-extrabold uppercase tracking-tight text-[#141517] mt-1">
-              TIGA LINI KOLEKSI UTAMA
+              Dirancang Sesuai Medan Pemakaian
             </h2>
-            <p className="text-xs sm:text-sm text-neutral-600 mt-2 leading-relaxed">
-              Setiap koleksi Geesthart dikembangkan dengan fungsi spesifik: dari perlindungan angin di hutan pinus hingga keleluasaan gerak di lapangan dan jalan raya.
+            <p className="text-xs sm:text-sm text-[#4A4D52] mt-2 leading-relaxed">
+              Setiap lini produk memiliki fungsi utama yang berbeda: perlindungan cuaca untuk jaket luar ruang, potongan longgar untuk celana harian, dan konstruksi lipat ringkas untuk perjalanan.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Nimble X */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6">
+            {/* Flagship Series: Nimble X (7 cols on desktop) */}
             <Link
               href="/catalog?collection=Nimble+X"
-              className="group relative aspect-[4/5] bg-[#141517] overflow-hidden border border-[#E2E2DC] flex flex-col justify-end p-6 sm:p-8"
+              className="lg:col-span-7 group relative min-h-[380px] sm:min-h-[480px] bg-[#141517] overflow-hidden border border-[#141517] flex flex-col justify-end p-5 sm:p-8"
             >
               <Image
                 src="/images/products/nimble-x-jacket-black.jpg"
-                alt="Nimble X Series"
+                alt="Jaket Fieldcore Nimble X Series warna Hitam"
                 fill
-                className="object-cover opacity-85 group-hover:scale-105 transition-transform duration-700"
+                sizes="(max-width: 1024px) 100vw, 58vw"
+                className="object-cover opacity-85 group-hover:scale-103 transition-transform duration-700"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent" />
-              <div className="relative z-10 text-white">
-                <span className="px-2.5 py-1 bg-[#555D47] text-[10px] font-bold uppercase tracking-[0.18em]">
-                  01 // NIMBLE X SERIES
+              <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/45 to-transparent" />
+              <div className="relative z-10 text-white max-w-lg">
+                <span className="inline-block px-2.5 py-1 bg-[#3F4734] text-white text-[11px] font-bold uppercase tracking-[0.14em]">
+                  Seri Utama • Nimble X
                 </span>
-                <h3 className="text-2xl font-extrabold uppercase tracking-tight mt-3">
-                  FIELDCORE OUTERWEAR
+                <h3 className="text-2xl sm:text-3xl font-extrabold uppercase tracking-tight mt-3">
+                  Fieldcore Outerwear (6 Saku Taktis)
                 </h3>
-                <p className="text-xs text-neutral-300 mt-1.5 leading-relaxed">
-                  Jaket teknikal multi-saku dengan storm hood yang dirancang untuk menembus angin dan cuaca tak menentu.
+                <p className="text-xs sm:text-sm text-neutral-200 mt-2 leading-relaxed">
+                  Jaket parachute crinkle dengan tudung storm hood dan 6 saku berpenutup untuk menyimpan perlengkapan tanpa perlu membawa tas tambahan. Tersedia dalam warna Black, Green Olive, dan Blue Oxford.
                 </p>
-                <span className="mt-4 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.14em] text-[#B8CCA0]">
-                  <span>Filter Nimble X</span>
-                  <ArrowUpRight className="w-4 h-4" />
+                <span className="mt-4 min-h-[40px] inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-[0.12em] text-[#B8CCA0] group-hover:underline">
+                  <span>Buka Koleksi Nimble X</span>
+                  <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
                 </span>
               </div>
             </Link>
 
-            {/* Litefield */}
-            <Link
-              href="/catalog?collection=Litefield"
-              className="group relative aspect-[4/5] bg-[#141517] overflow-hidden border border-[#E2E2DC] flex flex-col justify-end p-6 sm:p-8"
-            >
-              <Image
-                src="/images/products/litefield-pants-olive-1.jpg"
-                alt="Litefield Series"
-                fill
-                className="object-cover opacity-85 group-hover:scale-105 transition-transform duration-700"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent" />
-              <div className="relative z-10 text-white">
-                <span className="px-2.5 py-1 bg-[#283A66] text-[10px] font-bold uppercase tracking-[0.18em]">
-                  02 // LITEFIELD SERIES
-                </span>
-                <h3 className="text-2xl font-extrabold uppercase tracking-tight mt-3">
-                  EVERYDAY TRACK &amp; SKORT
-                </h3>
-                <p className="text-xs text-neutral-300 mt-1.5 leading-relaxed">
-                  Trackpants unisex, celana pendek, dan active skort wanita untuk mobilitas tinggi dari jalanan hingga lapangan padel.
-                </p>
-                <span className="mt-4 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.14em] text-[#9EB7E5]">
-                  <span>Filter Litefield</span>
-                  <ArrowUpRight className="w-4 h-4" />
-                </span>
-              </div>
-            </Link>
+            {/* Supporting Series Stack: Litefield & Fieldlite (5 cols on desktop, 2 cols on tablet) */}
+            <div className="lg:col-span-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-5 sm:gap-6">
+              {/* Litefield */}
+              <Link
+                href="/catalog?collection=Litefield"
+                className="group relative min-h-[260px] sm:min-h-[280px] bg-[#141517] overflow-hidden border border-[#141517] flex flex-col justify-end p-5 sm:p-6"
+              >
+                <Image
+                  src="/images/products/litefield-pants-olive-1.jpg"
+                  alt="Celana panjang Geesthart Litefield Trackpants warna Green Olive"
+                  fill
+                  sizes="(max-width: 1024px) 50vw, 42vw"
+                  className="object-cover opacity-85 group-hover:scale-103 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent" />
+                <div className="relative z-10 text-white">
+                  <span className="inline-block px-2.5 py-1 bg-white text-[#141517] text-[10px] font-extrabold uppercase tracking-[0.14em]">
+                    Seri 02 • Litefield
+                  </span>
+                  <h3 className="text-xl sm:text-2xl font-extrabold uppercase tracking-tight mt-2.5">
+                    Trackpants, Shortpants &amp; Active Skort
+                  </h3>
+                  <p className="text-xs text-neutral-200 mt-1 leading-relaxed">
+                    Celana panjang serut, celana pendek di atas lutut, dan rok celana olahraga wanita untuk mobilitas harian.
+                  </p>
+                  <span className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.12em] text-[#B8CCA0] group-hover:underline">
+                    <span>Filter Seri Litefield</span>
+                    <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
+                  </span>
+                </div>
+              </Link>
 
-            {/* Fieldlite */}
-            <Link
-              href="/catalog?collection=Fieldlite"
-              className="group relative aspect-[4/5] bg-[#141517] overflow-hidden border border-[#E2E2DC] flex flex-col justify-end p-6 sm:p-8"
-            >
-              <Image
-                src="/images/products/nimble-x-jacket-blue-oxford.jpg"
-                alt="Fieldlite Series"
-                fill
-                className="object-cover opacity-85 group-hover:scale-105 transition-transform duration-700"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent" />
-              <div className="relative z-10 text-white">
-                <span className="px-2.5 py-1 bg-neutral-800 border border-white/25 text-[10px] font-bold uppercase tracking-[0.18em]">
-                  03 // FIELDLITE SERIES
-                </span>
-                <h3 className="text-2xl font-extrabold uppercase tracking-tight mt-3">
-                  ULTRALIGHT PACKABLE
-                </h3>
-                <p className="text-xs text-neutral-300 mt-1.5 leading-relaxed">
-                  Eksperimen konstruksi seringan mungkin untuk para pejalan yang mengutamakan efisiensi ruang dan bobot.
-                </p>
-                <span className="mt-4 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.14em] text-white">
-                  <span>Filter Fieldlite</span>
-                  <ArrowUpRight className="w-4 h-4" />
-                </span>
-              </div>
-            </Link>
+              {/* Fieldlite */}
+              <Link
+                href="/catalog?collection=Fieldlite"
+                className="group relative min-h-[240px] sm:min-h-[260px] bg-[#141517] overflow-hidden border border-[#141517] flex flex-col justify-end p-5 sm:p-6"
+              >
+                <Image
+                  src="/images/products/nimble-x-jacket-blue-oxford.jpg"
+                  alt="Koleksi Fieldlite warna Blue Oxford"
+                  fill
+                  sizes="(max-width: 1024px) 50vw, 42vw"
+                  className="object-cover opacity-85 group-hover:scale-103 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent" />
+                <div className="relative z-10 text-white">
+                  <span className="inline-block px-2.5 py-1 bg-neutral-900 border border-white/30 text-white text-[10px] font-bold uppercase tracking-[0.14em]">
+                    Seri 03 • Fieldlite
+                  </span>
+                  <h3 className="text-xl sm:text-2xl font-extrabold uppercase tracking-tight mt-2.5">
+                    Packable Anorak &amp; Cargo
+                  </h3>
+                  <p className="text-xs text-neutral-200 mt-1 leading-relaxed">
+                    Eksplorasi bahan nilon ripstop ringan yang dapat dilipat ringkas ke dalam saku.
+                  </p>
+                  <span className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.12em] text-white group-hover:underline">
+                    <span>Lihat Seri Fieldlite</span>
+                    <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
+                  </span>
+                </div>
+              </Link>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* 5. Editorial Lookbook + Motion Reel Showcase */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-8 py-16 sm:py-24">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+      {/* 5. Editorial Lookbook + Motion Video Reel (with Pause/Play control per R-39) */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-8 py-12 sm:py-20">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           {/* Left: Editorial Copy + Lookbook Highlights (7 cols) */}
-          <div className="lg:col-span-7 space-y-6">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#555D47]/10 text-[#555D47] text-[11px] font-bold uppercase tracking-[0.18em]">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>EDITORIAL LOOKBOOK // BANDUNG 2024–2026</span>
-            </span>
-
-            <h2 className="text-3xl sm:text-5xl font-extrabold uppercase tracking-tight text-[#141517] leading-[1.08]">
-              DARI HUTAN PINUS KE JALANAN KOTA.
-            </h2>
-
-            <p className="text-sm text-neutral-600 leading-relaxed max-w-xl">
-              Geesthart lahir di Bandung dengan filosofi sederhana: pakaian teknis tidak harus kaku di jalanan kota, dan pakaian streetwear tidak boleh menyerah saat dibawa ke alam terbuka. Setiap artikel diuji langsung di dua lanskap tersebut.
+          <div className="lg:col-span-7 space-y-5">
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#3F4734]">
+              Arsip Dokumentasi Bandung
             </p>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-2">
+            <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold uppercase tracking-tight text-[#141517] leading-[1.08]">
+              Diuji Langsung di Hutan Pinus dan Aspal Kota.
+            </h2>
+
+            <p className="text-xs sm:text-sm text-[#4A4D52] leading-relaxed max-w-xl">
+              Kami memotret dan menguji setiap rilisan Geesthart di tempat pakaian tersebut benar-benar digunakan: jalur pohon pinus Bandung Utara saat pagi berkabut, trotoar jalan raya, hingga lapangan olahraga.
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
               {lookbooks.map((lb) => (
                 <Link
                   key={lb.id}
                   href="/lookbook"
-                  className="group block bg-white border border-[#E2E2DC] p-2.5 hover:border-[#141517] transition-colors"
+                  className="group block bg-white border border-[#DCDCD4] p-2.5 hover:border-[#141517] transition-colors"
                 >
-                  <div className="relative aspect-[3/4] w-full overflow-hidden bg-[#EFEFEA] mb-2.5">
+                  <div className="relative aspect-[4/3] sm:aspect-[3/4] w-full overflow-hidden bg-[#EFEFEA] mb-2.5">
                     <Image
                       src={lb.coverImage}
-                      alt={lb.title}
+                      alt={`${lb.title} - ${lb.collection}`}
                       fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      sizes="(max-width: 640px) 100vw, 25vw"
+                      className="object-cover group-hover:scale-103 transition-transform duration-500"
                     />
                   </div>
-                  <p className="text-[10px] font-mono uppercase tracking-wider text-[#555D47]">
-                    {lb.collection}
-                  </p>
-                  <h4 className="text-xs font-bold text-[#141517] truncate">
+                  <span className="block text-[10px] font-mono font-bold uppercase tracking-wider text-[#3F4734]">
+                    Seri {lb.collection}
+                  </span>
+                  <h3 className="text-xs font-extrabold text-[#141517] truncate mt-0.5">
                     {lb.title}
-                  </h4>
+                  </h3>
                 </Link>
               ))}
             </div>
@@ -255,57 +270,26 @@ export default async function HomePage() {
             <div className="pt-2 flex flex-wrap items-center gap-3">
               <Link
                 href="/lookbook"
-                className="px-5 py-3 bg-[#141517] text-white text-xs font-bold uppercase tracking-[0.15em] hover:bg-[#555D47] transition-colors inline-flex items-center gap-2"
+                className="min-h-[44px] px-5 py-2.5 bg-[#141517] text-white text-xs font-bold uppercase tracking-[0.14em] hover:bg-[#3F4734] active:bg-[#2F3627] transition-colors inline-flex items-center gap-2"
               >
                 <span>Buka Galeri Lookbook</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4" aria-hidden="true" />
               </Link>
               <Link
                 href="/about"
-                className="px-5 py-3 bg-white border border-[#141517] text-[#141517] text-xs font-bold uppercase tracking-[0.15em] hover:bg-[#EFEFEA] transition-colors"
+                className="min-h-[44px] px-5 py-2.5 bg-white border border-[#141517] text-[#141517] text-xs font-bold uppercase tracking-[0.14em] hover:bg-[#EFEFEA] transition-colors inline-flex items-center"
               >
-                Cerita Geesthart
+                Cerita Brand Geesthart
               </Link>
             </div>
           </div>
 
-          {/* Right: Official Motion Video Reel from fotoasetawal (5 cols) */}
+          {/* Right: Official Motion Video Reel with Pause/Play Control (5 cols) */}
           <div className="lg:col-span-5">
-            <div className="bg-white border border-[#141517] p-3 shadow-xl">
-              <div className="flex items-center justify-between pb-2.5 mb-2.5 border-b border-[#E2E2DC] text-[10px] font-mono uppercase tracking-[0.16em] text-neutral-500">
-                <span>FIELD ARCHIVE // MOTION REEL</span>
-                <span className="text-[#555D47] font-bold">● REC BANDUNG</span>
-              </div>
-              <div className="relative aspect-[9/14] w-full bg-[#141517] overflow-hidden">
-                <video
-                  src="/videos/geesthart-reel.mp4"
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  controls
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="pt-3 flex items-center justify-between text-xs">
-                <span className="font-bold text-[#141517]">
-                  @geesthart — In Motion
-                </span>
-                <a
-                  href={SITE_CONFIG.instagramUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[#555D47] font-bold hover:underline inline-flex items-center gap-1"
-                >
-                  <span>Instagram</span>
-                  <ArrowUpRight className="w-3.5 h-3.5" />
-                </a>
-              </div>
-            </div>
+            <VideoReelCard />
           </div>
         </div>
       </section>
     </div>
   );
 }
-

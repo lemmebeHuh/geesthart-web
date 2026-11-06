@@ -34,23 +34,27 @@ import {
   TrendingUp,
   Users,
   MousePointerClick,
-  Compass,
   ShoppingBag,
   Eye,
   RefreshCw,
+  AlertCircle,
+  X,
 } from 'lucide-react';
 
 export default function StudioPage() {
   const [activeTab, setActiveTab] = useState<'products' | 'analytics'>('products');
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
+  const [productsLoading, setProductsLoading] = useState<boolean>(true);
+  const [productsError, setProductsError] = useState<string>('');
   const [analytics, setAnalytics] = useState<AnalyticsSummary | null>(null);
-  const [analyticsLoading, setAnalyticsLoading] = useState<boolean>(false);
+  const [analyticsLoading, setAnalyticsLoading] = useState<boolean>(true);
+  const [analyticsError, setAnalyticsError] = useState<string>('');
   const [sanityToken, setSanityToken] = useState<string>('');
   const [saving, setSaving] = useState<boolean>(false);
   const [feedback, setFeedback] = useState<string>('');
+  const [isErrorFeedback, setIsErrorFeedback] = useState<boolean>(false);
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
 
-  // New Product Form State
   const [newName, setNewName] = useState('');
   const [newCollection, setNewCollection] =
     useState<ProductCollection>('Litefield');
@@ -65,27 +69,55 @@ export default function StudioPage() {
   const [newColorName, setNewColorName] = useState('Black');
   const [newColorHex, setNewColorHex] = useState('#18191B');
 
+  const fetchProducts = () => {
+    setProductsLoading(true);
+    setProductsError('');
+    fetch(`/api/cms/products?t=${Date.now()}`, { cache: 'no-store' })
+      .then((res) => {
+        if (!res.ok) throw new Error('Gagal memuat produk dari server.');
+        return res.json();
+      })
+      .then((data) => {
+        if (Array.isArray(data.products)) {
+          setProducts(data.products);
+        }
+      })
+      .catch((err) => {
+        setProductsError(err.message || 'Gagal memuat daftar produk.');
+      })
+      .finally(() => setProductsLoading(false));
+  };
+
   const fetchAnalytics = () => {
     setAnalyticsLoading(true);
+    setAnalyticsError('');
     fetch(`/api/analytics?t=${Date.now()}`, { cache: 'no-store' })
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error('Gagal memuat data statistik.');
+        return res.json();
+      })
       .then((data) => setAnalytics(data))
-      .catch(() => {})
+      .catch((err) => {
+        setAnalyticsError(err.message || 'Gagal memuat data statistik.');
+      })
       .finally(() => setAnalyticsLoading(false));
   };
 
   useEffect(() => {
-    fetch(`/api/cms/products?t=${Date.now()}`, { cache: 'no-store' })
-      .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data.products) && data.products.length > 0) {
-          setProducts(data.products);
-        }
-      })
-      .catch(() => {});
-
+    fetchProducts();
     fetchAnalytics();
   }, []);
+
+  // R-26 / R-32: Close Add Product modal on Escape
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && showAddModal) {
+        setShowAddModal(false);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [showAddModal]);
 
   const handleStatusChange = (id: string, newStatusVal: ProductStatus) => {
     setProducts((prev) =>
@@ -113,6 +145,7 @@ export default function StudioPage() {
     const listToSave = customProducts || products;
     setSaving(true);
     setFeedback('');
+    setIsErrorFeedback(false);
     try {
       const res = await fetch('/api/cms/products', {
         method: 'PUT',
@@ -124,15 +157,18 @@ export default function StudioPage() {
       });
       const data = await res.json();
       if (data.ok) {
+        setIsErrorFeedback(false);
         setFeedback(
           data.sanityMessage ||
-            'Perubahan berhasil disimpan! Halaman Katalog & Beranda sudah ter-update.'
+            'Perubahan disimpan. Halaman Katalog dan Beranda telah diperbarui.'
         );
       } else {
-        setFeedback(`Gagal menyimpan: ${data.error || 'Unknown error'}`);
+        setIsErrorFeedback(true);
+        setFeedback(`Gagal menyimpan: ${data.error || 'Terjadi kesalahan'}`);
       }
     } catch (err: any) {
-      setFeedback(`Error: ${err.message}`);
+      setIsErrorFeedback(true);
+      setFeedback(`Kesalahan koneksi: ${err.message}`);
     } finally {
       setSaving(false);
     }
@@ -170,12 +206,12 @@ export default function StudioPage() {
       status: newStatus,
       shortDescription:
         newShortDesc ||
-        `Artikel terbaru dari koleksi ${newCollection} Geesthart Bandung.`,
+        `Artikel terbaru dari seri ${newCollection} Geesthart Bandung.`,
       description:
         newShortDesc ||
-        `Dirancang dengan standar teknis Geesthart Bandung untuk aktivitas outdoor maupun harian di perkotaan.`,
-      materialSpecs: ['Technical Crinkle Nylon', 'Water-Repellent Finish'],
-      features: ['Ergonomic Gorpcore Fit', 'Signature Woven GH Patch'],
+        `Dirancang di Bandung untuk pemakaian luar ruang maupun aktivitas harian di kota.`,
+      materialSpecs: ['Kain nilon crinkle ringan', 'Tahan cipratan air ringan'],
+      features: ['Potongan nyaman bergerak', 'Label tenun resmi GH'],
       mainImage: newImage,
       gallery: [newImage],
       colors: [
@@ -196,7 +232,7 @@ export default function StudioPage() {
         {
           platform: 'TikTok Shop',
           url: SITE_CONFIG.tiktokUrl,
-          label: 'Beli via TikTok Shop',
+          label: 'Beli lewat TikTok Shop',
         },
       ],
       order: products.length + 1,
@@ -222,7 +258,8 @@ export default function StudioPage() {
       const data = await res.json();
       if (data.products) {
         setProducts(data.products);
-        setFeedback('Data katalog dikembalikan ke 6 produk awal Geesthart.');
+        setIsErrorFeedback(false);
+        setFeedback('Data katalog dikembalikan ke 6 artikel awal Geesthart.');
       }
     } finally {
       setSaving(false);
@@ -233,30 +270,29 @@ export default function StudioPage() {
     analytics?.storeClicks?.reduce((acc, curr) => acc + curr.clicks, 0) || 0;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-8 py-10 sm:py-14 space-y-8">
-      {/* Top Header with Live Project ID a2ie5vo6 */}
-      <div className="bg-[#141517] text-white p-6 sm:p-8 border border-[#141517] flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+    <div className="max-w-7xl mx-auto px-4 sm:px-8 py-8 sm:py-12 space-y-6 sm:space-y-8">
+      <div className="bg-[#141517] text-white p-5 sm:p-8 border border-[#141517] flex flex-col lg:flex-row lg:items-center justify-between gap-5">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#555D47] text-[10px] font-bold uppercase tracking-[0.18em] mb-2">
-            <Database className="w-3.5 h-3.5" />
-            <span>SANITY PROJECT ID: a2ie5vo6 • DATASET: production</span>
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#3F4734] text-[11px] font-bold uppercase tracking-[0.14em] mb-2">
+            <Database className="w-3.5 h-3.5" aria-hidden="true" />
+            <span>Sanity Project: a2ie5vo6 • Dataset: production</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold uppercase tracking-tight">
-            Geesthart Brand Panel &amp; Analytics
+          <h1 className="text-xl sm:text-3xl font-extrabold uppercase tracking-tight">
+            Panel Admin Katalog &amp; Statistik
           </h1>
           <p className="text-xs sm:text-sm text-neutral-300 mt-1.5 max-w-2xl leading-relaxed">
-            Kelola katalog produk, update harga, serta pantau statistik kunjungan dan konversi klik toko langsung dari satu tempat.
+            Tambah atau ubah artikel katalog serta pantau jumlah kunjungan halaman dan klik menuju toko resmi.
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 shrink-0">
+        <div className="flex flex-wrap items-center gap-2.5 shrink-0">
           {activeTab === 'products' ? (
             <button
               type="button"
               onClick={() => setShowAddModal(true)}
-              className="px-4 py-3 bg-[#555D47] hover:bg-[#687257] text-white text-xs font-extrabold uppercase tracking-[0.14em] transition-colors inline-flex items-center gap-2"
+              className="min-h-[44px] px-4 py-2.5 bg-[#3F4734] hover:bg-[#4F5942] text-white text-xs font-extrabold uppercase tracking-[0.12em] transition-colors inline-flex items-center gap-2"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-4 h-4" aria-hidden="true" />
               <span>Tambah Produk Baru</span>
             </button>
           ) : (
@@ -264,10 +300,13 @@ export default function StudioPage() {
               type="button"
               onClick={fetchAnalytics}
               disabled={analyticsLoading}
-              className="px-4 py-3 bg-[#555D47] hover:bg-[#687257] disabled:opacity-50 text-white text-xs font-extrabold uppercase tracking-[0.14em] transition-colors inline-flex items-center gap-2"
+              className="min-h-[44px] px-4 py-2.5 bg-[#3F4734] hover:bg-[#4F5942] disabled:opacity-50 text-white text-xs font-extrabold uppercase tracking-[0.12em] transition-colors inline-flex items-center gap-2"
             >
-              <RefreshCw className={`w-4 h-4 ${analyticsLoading ? 'animate-spin' : ''}`} />
-              <span>Refresh Metrik</span>
+              <RefreshCw
+                className={`w-4 h-4 ${analyticsLoading ? 'animate-spin' : ''}`}
+                aria-hidden="true"
+              />
+              <span>Muat Ulang Data</span>
             </button>
           )}
 
@@ -275,245 +314,398 @@ export default function StudioPage() {
             href="https://vercel.com/analytics"
             target="_blank"
             rel="noopener noreferrer"
-            className="px-4 py-3 bg-white text-[#141517] text-xs font-extrabold uppercase tracking-[0.14em] hover:bg-[#9CAF84] transition-colors inline-flex items-center gap-2"
+            className="min-h-[44px] px-4 py-2.5 bg-white text-[#141517] text-xs font-extrabold uppercase tracking-[0.12em] hover:bg-[#B8CCA0] transition-colors inline-flex items-center gap-2"
           >
             <span>Vercel Analytics</span>
-            <ExternalLink className="w-4 h-4" />
+            <ExternalLink className="w-4 h-4" aria-hidden="true" />
           </a>
         </div>
       </div>
 
-      {/* Tabs Switcher: Produk vs Statistik */}
-      <div className="flex items-center gap-6 border-b border-[#E2E2DC] pt-2">
+      <div
+        role="tablist"
+        aria-label="Pilih tampilan panel admin"
+        className="flex items-center gap-4 sm:gap-6 border-b border-[#DCDCD4]"
+      >
         <button
           type="button"
+          role="tab"
+          aria-selected={activeTab === 'products'}
           onClick={() => setActiveTab('products')}
-          className={`pb-3 text-xs font-extrabold uppercase tracking-[0.16em] transition-all flex items-center gap-2 relative ${
+          className={`min-h-[44px] pb-2 text-xs font-extrabold uppercase tracking-[0.14em] transition-colors flex items-center gap-2 relative ${
             activeTab === 'products'
               ? 'text-[#141517]'
-              : 'text-neutral-500 hover:text-[#141517]'
+              : 'text-[#4A4D52] hover:text-[#141517]'
           }`}
         >
-          <Sliders className="w-4 h-4" />
+          <Sliders className="w-4 h-4" aria-hidden="true" />
           <span>Katalog Produk ({products.length})</span>
           {activeTab === 'products' && (
-            <span className="absolute bottom-0 left-0 w-full h-[2.5px] bg-[#555D47]" />
+            <span className="absolute bottom-0 left-0 w-full h-[3px] bg-[#3F4734]" />
           )}
         </button>
 
         <button
           type="button"
+          role="tab"
+          aria-selected={activeTab === 'analytics'}
           onClick={() => setActiveTab('analytics')}
-          className={`pb-3 text-xs font-extrabold uppercase tracking-[0.16em] transition-all flex items-center gap-2 relative ${
+          className={`min-h-[44px] pb-2 text-xs font-extrabold uppercase tracking-[0.14em] transition-colors flex items-center gap-2 relative ${
             activeTab === 'analytics'
               ? 'text-[#141517]'
-              : 'text-neutral-500 hover:text-[#141517]'
+              : 'text-[#4A4D52] hover:text-[#141517]'
           }`}
         >
-          <BarChart3 className="w-4 h-4" />
-          <span>Statistik Kunjungan &amp; Traffic</span>
-          <span className="px-1.5 py-0.5 text-[9px] bg-[#555D47]/15 text-[#555D47] rounded-sm font-bold">
-            Live
-          </span>
+          <BarChart3 className="w-4 h-4" aria-hidden="true" />
+          <span>Statistik Kunjungan</span>
           {activeTab === 'analytics' && (
-            <span className="absolute bottom-0 left-0 w-full h-[2.5px] bg-[#555D47]" />
+            <span className="absolute bottom-0 left-0 w-full h-[3px] bg-[#3F4734]" />
           )}
         </button>
       </div>
 
-      {/* Feedback Banner */}
       {feedback && (
-        <div className="p-4 bg-[#555D47]/15 border border-[#555D47] text-[#141517] text-xs font-bold flex items-center justify-between gap-4">
+        <div
+          role="status"
+          aria-live="polite"
+          className={`p-4 border text-xs font-bold flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+            isErrorFeedback
+              ? 'bg-[#FDF2F0] border-[#B32810] text-[#7A1807]'
+              : 'bg-[#EFF2EC] border-[#3F4734] text-[#141517]'
+          }`}
+        >
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-[#555D47] shrink-0" />
+            {isErrorFeedback ? (
+              <AlertCircle className="w-4 h-4 text-[#B32810] shrink-0" aria-hidden="true" />
+            ) : (
+              <CheckCircle2 className="w-4 h-4 text-[#3F4734] shrink-0" aria-hidden="true" />
+            )}
             <span>{feedback}</span>
           </div>
           <Link
             href="/catalog"
-            className="px-3 py-1.5 bg-[#141517] text-white text-[10px] uppercase tracking-wider inline-flex items-center gap-1 shrink-0"
+            className="min-h-[38px] px-3 py-1.5 bg-[#141517] text-white text-[11px] uppercase tracking-wider inline-flex items-center justify-center gap-1 shrink-0"
           >
             <span>Lihat di Katalog</span>
-            <ArrowUpRight className="w-3 h-3" />
+            <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
           </Link>
         </div>
       )}
 
-      {/* ================= TAB 1: PRODUK & SINKRONISASI ================= */}
       {activeTab === 'products' && (
         <>
-          {/* Sanity Cloud Sync Box */}
-          <div className="bg-white border border-[#E2E2DC] p-5 sm:p-6">
+          <div className="bg-white border border-[#DCDCD4] p-5 sm:p-6">
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
               <div className="space-y-1 max-w-2xl">
-                <div className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.14em] text-[#283A66]">
-                  <CloudUpload className="w-4 h-4" />
-                  <span>Sinkronisasi Cloud Sanity (Project ID: a2ie5vo6)</span>
+                <div className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.12em] text-[#1D2B4D]">
+                  <CloudUpload className="w-4 h-4" aria-hidden="true" />
+                  <span>Sinkronisasi Cloud Sanity (ID: a2ie5vo6)</span>
                 </div>
-                <p className="text-xs text-neutral-600 leading-relaxed">
-                  Setiap klik <strong>&ldquo;Simpan Semua Perubahan&rdquo;</strong> otomatis memperbarui website. Token Editor kamu sudah tersimpan di sistem untuk push ke project <code>a2ie5vo6</code>.
+                <p className="text-xs text-[#4A4D52] leading-relaxed">
+                  Tekan tombol <strong>Simpan Semua Perubahan</strong> setelah mengubah harga, nama, atau status stok untuk memperbarui katalog publik.
                 </p>
               </div>
 
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 shrink-0">
-                <div className="relative">
-                  <KeyRound className="w-3.5 h-3.5 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="password"
-                    value={sanityToken}
-                    onChange={(e) => setSanityToken(e.target.value)}
-                    placeholder="Token Tersimpan (Bisa ditimpa)"
-                    className="w-full sm:w-64 pl-9 pr-3 py-2.5 text-xs bg-[#F7F7F4] border border-[#D5D5CE] focus:outline-none focus:border-[#141517]"
-                  />
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-end gap-2.5 shrink-0">
+                <div>
+                  <label
+                    htmlFor="sanity-token-input"
+                    className="block text-[11px] font-bold uppercase tracking-wider text-[#141517] mb-1"
+                  >
+                    Token Sanity (Opsional jika sudah di server)
+                  </label>
+                  <div className="relative">
+                    <KeyRound
+                      className="w-3.5 h-3.5 text-[#4A4D52] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
+                      aria-hidden="true"
+                    />
+                    <input
+                      id="sanity-token-input"
+                      type="password"
+                      value={sanityToken}
+                      onChange={(e) => setSanityToken(e.target.value)}
+                      placeholder="Kosongkan untuk pakai token server"
+                      className="min-h-[44px] w-full sm:w-64 pl-9 pr-3 py-2 text-xs bg-[#F7F7F4] border border-[#C8C8C0] text-[#141517]"
+                    />
+                  </div>
                 </div>
 
                 <button
                   type="button"
                   disabled={saving}
                   onClick={() => handleSaveAll()}
-                  className="px-5 py-2.5 bg-[#141517] hover:bg-[#555D47] disabled:opacity-50 text-white text-xs font-extrabold uppercase tracking-[0.14em] transition-colors inline-flex items-center justify-center gap-2"
+                  className="min-h-[44px] px-5 py-2.5 bg-[#141517] hover:bg-[#3F4734] disabled:opacity-50 text-white text-xs font-extrabold uppercase tracking-[0.12em] transition-colors inline-flex items-center justify-center gap-2"
                 >
-                  <Save className="w-4 h-4" />
+                  <Save className="w-4 h-4" aria-hidden="true" />
                   <span>{saving ? 'Menyimpan...' : 'Simpan Semua Perubahan'}</span>
                 </button>
               </div>
             </div>
           </div>
 
-          {/* Interactive Product Table */}
-          <div className="bg-white border border-[#E2E2DC] p-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 mb-6 border-b border-[#E2E2DC]">
+          {/* Product List Container with Loading / Error / Empty states (R-27) */}
+          <div className="bg-white border border-[#DCDCD4] p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 mb-5 border-b border-[#DCDCD4]">
               <div>
-                <h2 className="text-sm font-extrabold uppercase tracking-[0.15em] text-[#141517] flex items-center gap-2">
-                  <Sliders className="w-4 h-4 text-[#555D47]" />
-                  <span>Daftar Katalog Produk Aktif ({products.length} Artikel)</span>
+                <h2 className="text-sm font-extrabold uppercase tracking-[0.14em] text-[#141517] flex items-center gap-2">
+                  <Sliders className="w-4 h-4 text-[#3F4734]" aria-hidden="true" />
+                  <span>Daftar Artikel Katalog ({products.length})</span>
                 </h2>
-                <p className="text-xs text-neutral-500 mt-0.5">
-                  Ubah nama, harga, atau status stok di bawah ini lalu klik tombol <strong>Simpan Semua Perubahan</strong>.
+                <p className="text-xs text-[#4A4D52] mt-0.5">
+                  Ubah nama, harga, atau status ketersediaan lalu klik Simpan Semua Perubahan.
                 </p>
               </div>
 
               <button
                 type="button"
                 onClick={handleResetDefault}
-                className="text-xs font-semibold text-neutral-500 hover:text-[#141517] inline-flex items-center gap-1.5"
+                className="min-h-[40px] px-3 border border-[#C8C8C0] text-xs font-bold text-[#141517] hover:bg-[#F7F7F4] inline-flex items-center gap-1.5 self-start sm:self-auto"
               >
-                <RotateCcw className="w-3.5 h-3.5" />
-                <span>Reset ke Data Awal</span>
+                <RotateCcw className="w-3.5 h-3.5" aria-hidden="true" />
+                <span>Kembalikan Data Awal</span>
               </button>
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse text-xs">
-                <thead>
-                  <tr className="bg-[#F7F7F4] border-y border-[#E2E2DC] text-[10px] font-bold uppercase tracking-wider text-neutral-600">
-                    <th className="py-3 px-4">Nama Produk</th>
-                    <th className="py-3 px-4">Koleksi &amp; Kategori</th>
-                    <th className="py-3 px-4">Varian Warna</th>
-                    <th className="py-3 px-4">Harga (Rp)</th>
-                    <th className="py-3 px-4">Status Stok</th>
-                    <th className="py-3 px-4 text-right">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#E2E2DC]">
+            {productsLoading ? (
+              <div role="status" className="py-12 text-center text-xs font-bold uppercase tracking-wider text-[#4A4D52]">
+                Sedang memuat daftar produk dari penyimpanan...
+              </div>
+            ) : productsError ? (
+              <div role="alert" className="p-6 bg-[#FDF2F0] border border-[#B32810] text-xs text-[#7A1807] space-y-3">
+                <p className="font-bold">{productsError}</p>
+                <button
+                  type="button"
+                  onClick={fetchProducts}
+                  className="min-h-[40px] px-4 py-2 bg-[#141517] text-white font-bold uppercase"
+                >
+                  Coba Muat Ulang
+                </button>
+              </div>
+            ) : products.length === 0 ? (
+              <div className="py-12 text-center space-y-3">
+                <p className="text-sm font-bold text-[#141517]">
+                  Belum ada produk di dalam katalog.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setShowAddModal(true)}
+                  className="min-h-[44px] px-5 py-2.5 bg-[#141517] text-white text-xs font-bold uppercase"
+                >
+                  Tambah Produk Pertama
+                </button>
+              </div>
+            ) : (
+              <>
+                {/* MOBILE & TABLET REFLOWED CARDS (< lg: prevents sideways table scroll on phones per R-03) */}
+                <div className="lg:hidden space-y-4">
                   {products.map((prod) => (
-                    <tr key={prod.id} className="hover:bg-[#F7F7F4]/50">
-                      <td className="py-3.5 px-4">
-                        <input
-                          type="text"
-                          value={prod.name}
-                          onChange={(e) => handleNameChange(prod.id, e.target.value)}
-                          className="w-full min-w-[200px] px-2.5 py-1.5 bg-[#F7F7F4] border border-[#D5D5CE] font-bold text-[#141517]"
-                        />
-                        <Link
-                          href={`/product/${prod.slug}`}
-                          className="inline-block text-[10px] font-mono text-[#283A66] hover:underline mt-1"
-                        >
-                          Lihat halaman: /product/{prod.slug} ↗
-                        </Link>
-                      </td>
-                      <td className="py-3.5 px-4">
+                    <div
+                      key={`mob-${prod.id}`}
+                      className="p-4 bg-[#F7F7F4] border border-[#DCDCD4] space-y-3"
+                    >
+                      <div className="flex items-start justify-between gap-2">
                         <span className="px-2 py-0.5 bg-[#141517] text-white text-[10px] font-bold uppercase">
-                          {prod.collection}
+                          {prod.collection} • {getCategoryLabel(prod.category)}
                         </span>
-                        <span className="block text-[11px] text-neutral-500 mt-1">
-                          {getCategoryLabel(prod.category)} ({prod.genderType})
-                        </span>
-                      </td>
-                      <td className="py-3.5 px-4">
-                        <div className="flex flex-wrap gap-1">
-                          {prod.colors.map((c) => (
-                            <span
-                              key={c.name}
-                              className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#F7F7F4] border border-[#E2E2DC] text-[10px]"
-                            >
-                              <span
-                                className="w-2 h-2 rounded-full"
-                                style={{ backgroundColor: c.hex }}
-                              />
-                              {c.name}
-                            </span>
-                          ))}
-                        </div>
-                      </td>
-                      <td className="py-3.5 px-4">
-                        <input
-                          type="number"
-                          value={prod.price}
-                          onChange={(e) =>
-                            handlePriceChange(prod.id, Number(e.target.value) || 0)
-                          }
-                          className="w-28 px-2.5 py-1.5 bg-[#F7F7F4] border border-[#D5D5CE] font-bold text-[#141517]"
-                        />
-                        <span className="block text-[10px] text-neutral-500 mt-0.5">
-                          {formatRupiah(prod.price)}
-                        </span>
-                      </td>
-                      <td className="py-3.5 px-4">
-                        <select
-                          value={prod.status}
-                          onChange={(e) =>
-                            handleStatusChange(prod.id, e.target.value as ProductStatus)
-                          }
-                          className="px-2.5 py-1.5 bg-white border border-[#D5D5CE] font-bold text-xs text-[#141517]"
-                        >
-                          <option value="tersedia">Tersedia</option>
-                          <option value="segera-hadir">Segera Hadir</option>
-                          <option value="habis">Habis (Sold Out)</option>
-                        </select>
-                      </td>
-                      <td className="py-3.5 px-4 text-right">
                         <button
                           type="button"
                           onClick={() => handleDeleteProduct(prod.id)}
-                          className="p-2 text-neutral-400 hover:text-red-600 transition-colors"
-                          title="Hapus produk"
+                          aria-label={`Hapus produk ${prod.name}`}
+                          className="min-w-[40px] min-h-[40px] -mt-1 -mr-1 inline-flex items-center justify-center text-[#4A4D52] hover:text-[#B32810]"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-4 h-4" aria-hidden="true" />
                         </button>
-                      </td>
-                    </tr>
+                      </div>
+
+                      <div>
+                        <label
+                          htmlFor={`mob-name-${prod.id}`}
+                          className="block text-[11px] font-bold uppercase text-[#4A4D52] mb-1"
+                        >
+                          Nama Artikel
+                        </label>
+                        <input
+                          id={`mob-name-${prod.id}`}
+                          type="text"
+                          value={prod.name}
+                          onChange={(e) => handleNameChange(prod.id, e.target.value)}
+                          className="min-h-[44px] w-full px-3 py-2 bg-white border border-[#C8C8C0] text-xs font-bold text-[#141517]"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label
+                            htmlFor={`mob-price-${prod.id}`}
+                            className="block text-[11px] font-bold uppercase text-[#4A4D52] mb-1"
+                          >
+                            Harga (Rp)
+                          </label>
+                          <input
+                            id={`mob-price-${prod.id}`}
+                            type="number"
+                            value={prod.price}
+                            onChange={(e) =>
+                              handlePriceChange(prod.id, Number(e.target.value) || 0)
+                            }
+                            className="min-h-[44px] w-full px-3 py-2 bg-white border border-[#C8C8C0] text-xs font-bold text-[#141517] tabular-nums"
+                          />
+                        </div>
+
+                        <div>
+                          <label
+                            htmlFor={`mob-status-${prod.id}`}
+                            className="block text-[11px] font-bold uppercase text-[#4A4D52] mb-1"
+                          >
+                            Status Stok
+                          </label>
+                          <select
+                            id={`mob-status-${prod.id}`}
+                            value={prod.status}
+                            onChange={(e) =>
+                              handleStatusChange(prod.id, e.target.value as ProductStatus)
+                            }
+                            className="min-h-[44px] w-full px-3 py-2 bg-white border border-[#C8C8C0] text-xs font-bold text-[#141517]"
+                          >
+                            <option value="tersedia">Tersedia</option>
+                            <option value="segera-hadir">Segera Hadir</option>
+                            <option value="habis">Habis</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
                   ))}
-                </tbody>
-              </table>
-            </div>
+                </div>
+
+                {/* DESKTOP TABLE (lg+) */}
+                <div className="hidden lg:block overflow-x-auto">
+                  <table className="w-full text-left border-collapse text-xs">
+                    <thead>
+                      <tr className="bg-[#F7F7F4] border-y border-[#DCDCD4] text-[11px] font-bold uppercase tracking-wider text-[#141517]">
+                        <th scope="col" className="py-3 px-4">Nama Artikel</th>
+                        <th scope="col" className="py-3 px-4">Seri &amp; Kategori</th>
+                        <th scope="col" className="py-3 px-4">Varian Warna</th>
+                        <th scope="col" className="py-3 px-4">Harga (Rp)</th>
+                        <th scope="col" className="py-3 px-4">Status Stok</th>
+                        <th scope="col" className="py-3 px-4 text-right">Hapus</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#DCDCD4]">
+                      {products.map((prod) => (
+                        <tr key={prod.id} className="hover:bg-[#F7F7F4]/60">
+                          <td className="py-3.5 px-4">
+                            <label htmlFor={`desk-name-${prod.id}`} className="sr-only">
+                              Nama artikel {prod.name}
+                            </label>
+                            <input
+                              id={`desk-name-${prod.id}`}
+                              type="text"
+                              value={prod.name}
+                              onChange={(e) => handleNameChange(prod.id, e.target.value)}
+                              className="min-h-[40px] w-full min-w-[220px] px-3 py-1.5 bg-[#F7F7F4] border border-[#C8C8C0] font-bold text-[#141517]"
+                            />
+                            <Link
+                              href={`/product/${prod.slug}`}
+                              className="inline-block text-[11px] font-mono text-[#1D2B4D] hover:underline mt-1"
+                            >
+                              /product/{prod.slug}
+                            </Link>
+                          </td>
+                          <td className="py-3.5 px-4">
+                            <span className="px-2 py-0.5 bg-[#141517] text-white text-[10px] font-bold uppercase">
+                              {prod.collection}
+                            </span>
+                            <span className="block text-xs text-[#4A4D52] mt-1">
+                              {getCategoryLabel(prod.category)} ({prod.genderType})
+                            </span>
+                          </td>
+                          <td className="py-3.5 px-4">
+                            <div className="flex flex-wrap gap-1.5">
+                              {prod.colors.map((c) => (
+                                <span
+                                  key={c.name}
+                                  className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[#F7F7F4] border border-[#DCDCD4] text-[11px] font-medium"
+                                >
+                                  <span
+                                    className="w-2.5 h-2.5 rounded-full border border-black/20"
+                                    style={{ backgroundColor: c.hex }}
+                                    aria-hidden="true"
+                                  />
+                                  {c.name}
+                                </span>
+                              ))}
+                            </div>
+                          </td>
+                          <td className="py-3.5 px-4">
+                            <label htmlFor={`desk-price-${prod.id}`} className="sr-only">
+                              Harga {prod.name}
+                            </label>
+                            <input
+                              id={`desk-price-${prod.id}`}
+                              type="number"
+                              value={prod.price}
+                              onChange={(e) =>
+                                handlePriceChange(prod.id, Number(e.target.value) || 0)
+                              }
+                              className="min-h-[40px] w-32 px-3 py-1.5 bg-[#F7F7F4] border border-[#C8C8C0] font-bold text-[#141517] tabular-nums"
+                            />
+                            <span className="block text-[11px] text-[#4A4D52] mt-0.5 tabular-nums">
+                              {formatRupiah(prod.price)}
+                            </span>
+                          </td>
+                          <td className="py-3.5 px-4">
+                            <label htmlFor={`desk-status-${prod.id}`} className="sr-only">
+                              Status stok {prod.name}
+                            </label>
+                            <select
+                              id={`desk-status-${prod.id}`}
+                              value={prod.status}
+                              onChange={(e) =>
+                                handleStatusChange(
+                                  prod.id,
+                                  e.target.value as ProductStatus
+                                )
+                              }
+                              className="min-h-[40px] px-3 py-1.5 bg-white border border-[#C8C8C0] font-bold text-xs text-[#141517]"
+                            >
+                              <option value="tersedia">Tersedia</option>
+                              <option value="segera-hadir">Segera Hadir</option>
+                              <option value="habis">Habis</option>
+                            </select>
+                          </td>
+                          <td className="py-3.5 px-4 text-right">
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteProduct(prod.id)}
+                              className="min-w-[40px] min-h-[40px] inline-flex items-center justify-center text-[#4A4D52] hover:text-[#B32810] transition-colors"
+                              aria-label={`Hapus artikel ${prod.name}`}
+                            >
+                              <Trash2 className="w-4 h-4" aria-hidden="true" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
+            )}
           </div>
         </>
       )}
 
-      {/* ================= TAB 2: STATISTIK KUNJUNGAN & TRAFFIC ================= */}
       {activeTab === 'analytics' && (
-        <div className="space-y-8">
-          {/* Real Analytics Status Banner & Vercel Web Analytics Banner */}
+        <div className="space-y-6 sm:space-y-8">
           <div className="bg-white border border-[#141517] p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#141517]">
-                  Statistik Real-Time Aktif (Cloud Sanity a2ie5vo6 + Vercel)
+                <span className="w-2.5 h-2.5 rounded-full bg-[#3F4734]" aria-hidden="true" />
+                <span className="text-xs font-extrabold uppercase tracking-[0.14em] text-[#141517]">
+                  Pencatatan Kunjungan Aktif (Sanity a2ie5vo6 &amp; Vercel)
                 </span>
               </div>
-              <p className="text-xs text-neutral-600 max-w-2xl leading-relaxed">
-                Data di bawah ini mencatat pengunjung asli dan setiap klik ke channel marketplace (Shopee, TikTok, WhatsApp). Karena baru saja diaktifkan, angka bertambah otomatis seiring bertambahnya pengunjung website.
+              <p className="text-xs text-[#4A4D52] max-w-2xl leading-relaxed">
+                Metrik di bawah ini dihitung dari kunjungan halaman nyata dan klik tombol pembelian menuju Shopee, TikTok Shop, maupun WhatsApp.
               </p>
             </div>
 
@@ -521,98 +713,111 @@ export default function StudioPage() {
               href="https://vercel.com/analytics"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-5 py-3 bg-[#141517] text-white hover:bg-[#555D47] text-xs font-extrabold uppercase tracking-[0.14em] transition-colors inline-flex items-center gap-2 shrink-0"
+              className="min-h-[44px] px-5 py-2.5 bg-[#141517] text-white hover:bg-[#3F4734] text-xs font-extrabold uppercase tracking-[0.12em] transition-colors inline-flex items-center justify-center gap-2 shrink-0"
             >
-              <BarChart3 className="w-4 h-4 text-[#9CAF84]" />
-              <span>Buka Grafik Vercel Analytics</span>
-              <ExternalLink className="w-3.5 h-3.5" />
+              <BarChart3 className="w-4 h-4 text-[#B8CCA0]" aria-hidden="true" />
+              <span>Buka Vercel Web Analytics</span>
+              <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
             </a>
           </div>
 
-          {analytics && (
+          {analyticsLoading ? (
+            <div role="status" className="bg-white border border-[#DCDCD4] p-12 text-center text-xs font-bold uppercase tracking-wider text-[#4A4D52]">
+              Sedang mengambil data statistik kunjungan terbaru...
+            </div>
+          ) : analyticsError ? (
+            <div role="alert" className="bg-[#FDF2F0] border border-[#B32810] p-6 text-xs text-[#7A1807] space-y-3">
+              <p className="font-bold">{analyticsError}</p>
+              <button
+                type="button"
+                onClick={fetchAnalytics}
+                className="min-h-[40px] px-4 py-2 bg-[#141517] text-white font-bold uppercase"
+              >
+                Coba Lagi
+              </button>
+            </div>
+          ) : analytics ? (
             <>
               {/* Top 4 KPI Metrics Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="bg-white border border-[#E2E2DC] p-5">
-                  <div className="flex items-center justify-between text-neutral-500 mb-2">
-                    <span className="text-[10px] font-extrabold uppercase tracking-[0.16em]">
-                      Total Pageviews
+                <div className="bg-white border border-[#DCDCD4] p-5">
+                  <div className="flex items-center justify-between text-[#4A4D52] mb-2">
+                    <span className="text-[11px] font-extrabold uppercase tracking-wider">
+                      Total Tayangan Halaman
                     </span>
-                    <Eye className="w-4 h-4 text-[#555D47]" />
+                    <Eye className="w-4 h-4 text-[#3F4734]" aria-hidden="true" />
                   </div>
-                  <div className="text-3xl font-black text-[#141517]">
+                  <div className="text-3xl font-black text-[#141517] tabular-nums">
                     {analytics.totalPageViews.toLocaleString('id-ID')}
                   </div>
-                  <span className="text-[11px] text-neutral-500 mt-1 block">
-                    Kunjungan asli sejak aktif
+                  <span className="text-xs text-[#4A4D52] mt-1 block">
+                    Akumulasi seluruh halaman
                   </span>
                 </div>
 
-                <div className="bg-white border border-[#E2E2DC] p-5">
-                  <div className="flex items-center justify-between text-neutral-500 mb-2">
-                    <span className="text-[10px] font-extrabold uppercase tracking-[0.16em]">
-                      Pengunjung Unik (Est)
+                <div className="bg-white border border-[#DCDCD4] p-5">
+                  <div className="flex items-center justify-between text-[#4A4D52] mb-2">
+                    <span className="text-[11px] font-extrabold uppercase tracking-wider">
+                      Pengunjung Unik
                     </span>
-                    <Users className="w-4 h-4 text-[#283A66]" />
+                    <Users className="w-4 h-4 text-[#1D2B4D]" aria-hidden="true" />
                   </div>
-                  <div className="text-3xl font-black text-[#141517]">
+                  <div className="text-3xl font-black text-[#141517] tabular-nums">
                     {analytics.uniqueVisitors.toLocaleString('id-ID')}
                   </div>
-                  <span className="text-[11px] text-neutral-500 mt-1 block">
-                    Pengguna berbeda
+                  <span className="text-xs text-[#4A4D52] mt-1 block">
+                    Sesi perangkat berbeda
                   </span>
                 </div>
 
-                <div className="bg-white border border-[#E2E2DC] p-5">
-                  <div className="flex items-center justify-between text-neutral-500 mb-2">
-                    <span className="text-[10px] font-extrabold uppercase tracking-[0.16em]">
+                <div className="bg-white border border-[#DCDCD4] p-5">
+                  <div className="flex items-center justify-between text-[#4A4D52] mb-2">
+                    <span className="text-[11px] font-extrabold uppercase tracking-wider">
                       Kunjungan Hari Ini
                     </span>
-                    <TrendingUp className="w-4 h-4 text-emerald-600" />
+                    <TrendingUp className="w-4 h-4 text-[#3F4734]" aria-hidden="true" />
                   </div>
-                  <div className="text-3xl font-black text-emerald-700">
+                  <div className="text-3xl font-black text-[#3F4734] tabular-nums">
                     +{analytics.todayViews.toLocaleString('id-ID')}
                   </div>
-                  <span className="text-[11px] text-neutral-500 mt-1 block">
-                    Sesi aktif hari ini
+                  <span className="text-xs text-[#4A4D52] mt-1 block">
+                    Tercatat hari ini
                   </span>
                 </div>
 
-                <div className="bg-white border border-[#E2E2DC] p-5">
-                  <div className="flex items-center justify-between text-neutral-500 mb-2">
-                    <span className="text-[10px] font-extrabold uppercase tracking-[0.16em]">
-                      Total Klik Beli (CTA)
+                <div className="bg-white border border-[#DCDCD4] p-5">
+                  <div className="flex items-center justify-between text-[#4A4D52] mb-2">
+                    <span className="text-[11px] font-extrabold uppercase tracking-wider">
+                      Total Klik Toko Resmi
                     </span>
-                    <MousePointerClick className="w-4 h-4 text-purple-600" />
+                    <MousePointerClick className="w-4 h-4 text-[#141517]" aria-hidden="true" />
                   </div>
-                  <div className="text-3xl font-black text-[#141517]">
+                  <div className="text-3xl font-black text-[#141517] tabular-nums">
                     {totalStoreClicks.toLocaleString('id-ID')}
                   </div>
-                  <span className="text-[11px] text-neutral-500 mt-1 block">
-                    Klik ke Shopee, WA, TT
+                  <span className="text-xs text-[#4A4D52] mt-1 block">
+                    Klik Shopee, TikTok &amp; WA
                   </span>
                 </div>
               </div>
 
               {/* Row 2: Traffic Referral vs Conversion Store Breakdown */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8">
                 {/* Left: Referrers (6 cols) */}
-                <div className="lg:col-span-6 bg-white border border-[#E2E2DC] p-6 space-y-4">
-                  <div className="flex items-center justify-between pb-3 border-b border-[#E2E2DC]">
-                    <div>
-                      <h3 className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#141517]">
-                        Sumber Kunjungan (Traffic Referrers)
-                      </h3>
-                      <p className="text-[11px] text-neutral-500 mt-0.5">
-                        Asal link pengunjung (Instagram, TikTok, Google, Direct)
-                      </p>
-                    </div>
+                <div className="lg:col-span-6 bg-white border border-[#DCDCD4] p-5 sm:p-6 space-y-4">
+                  <div className="pb-3 border-b border-[#DCDCD4]">
+                    <h3 className="text-xs font-extrabold uppercase tracking-[0.14em] text-[#141517]">
+                      Asal Kunjungan (Traffic Referrer)
+                    </h3>
+                    <p className="text-xs text-[#4A4D52] mt-0.5">
+                      Sumber tautan pengunjung yang masuk ke situs Geesthart
+                    </p>
                   </div>
 
-                  <div className="space-y-3.5 pt-2">
+                  <div className="space-y-3.5 pt-1">
                     {analytics.referrers.length === 0 ? (
-                      <p className="text-xs text-neutral-500 italic py-4 text-center">
-                        Belum ada data rujukan. Data akan terisi otomatis saat pengunjung datang dari Instagram bio, TikTok, atau link langsung.
+                      <p className="text-xs text-[#4A4D52] py-4 text-center">
+                        Belum ada data rujukan eksternal. Data akan muncul saat pengunjung membuka web dari tautan Instagram, TikTok, atau mesin pencari.
                       </p>
                     ) : (
                       analytics.referrers.map((ref) => {
@@ -621,15 +826,15 @@ export default function StudioPage() {
                         );
                         return (
                           <div key={ref.source} className="space-y-1">
-                            <div className="flex items-center justify-between text-xs font-semibold">
+                            <div className="flex items-center justify-between text-xs font-bold">
                               <span className="text-[#141517]">{ref.source}</span>
-                              <span className="text-neutral-500 font-mono">
-                                {ref.count} klik ({percent}%)
+                              <span className="text-[#4A4D52] font-mono tabular-nums">
+                                {ref.count} kunjungan ({percent}%)
                               </span>
                             </div>
-                            <div className="w-full bg-[#F7F7F4] h-2 rounded-xs overflow-hidden border border-[#E2E2DC]">
+                            <div className="w-full bg-[#F7F7F4] h-2.5 overflow-hidden border border-[#DCDCD4]">
                               <div
-                                className="bg-[#555D47] h-full"
+                                className="bg-[#3F4734] h-full"
                                 style={{ width: `${Math.min(percent, 100)}%` }}
                               />
                             </div>
@@ -641,82 +846,75 @@ export default function StudioPage() {
                 </div>
 
                 {/* Right: Conversion By Store (6 cols) */}
-                <div className="lg:col-span-6 bg-white border border-[#E2E2DC] p-6 space-y-4">
-                  <div className="flex items-center justify-between pb-3 border-b border-[#E2E2DC]">
-                    <div>
-                      <h3 className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#141517]">
-                        Konversi Saluran Pembelian
-                      </h3>
-                      <p className="text-[11px] text-neutral-500 mt-0.5">
-                        Jumlah klik tombol beli ke masing-masing channel resmi
-                      </p>
-                    </div>
+                <div className="lg:col-span-6 bg-white border border-[#DCDCD4] p-5 sm:p-6 space-y-4">
+                  <div className="pb-3 border-b border-[#DCDCD4]">
+                    <h3 className="text-xs font-extrabold uppercase tracking-[0.14em] text-[#141517]">
+                      Jumlah Klik per Kanal Pembelian
+                    </h3>
+                    <p className="text-xs text-[#4A4D52] mt-0.5">
+                      Perbandingan kanal toko yang dipilih pembeli saat menekan tombol Beli
+                    </p>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3.5 pt-2">
+                  <div className="grid grid-cols-2 gap-3.5 pt-1">
                     {analytics.storeClicks.map((store) => (
                       <div
                         key={store.platform}
-                        className="p-4 bg-[#F7F7F4] border border-[#E2E2DC] space-y-1.5"
+                        className="p-4 bg-[#F7F7F4] border border-[#DCDCD4] space-y-1"
                       >
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold text-[#141517]">
+                          <span className="text-xs font-extrabold text-[#141517]">
                             {store.platform}
                           </span>
-                          <ShoppingBag className="w-3.5 h-3.5 text-[#555D47]" />
+                          <ShoppingBag className="w-3.5 h-3.5 text-[#3F4734]" aria-hidden="true" />
                         </div>
-                        <div className="text-2xl font-black text-[#141517]">
+                        <div className="text-2xl font-black text-[#141517] tabular-nums">
                           {store.clicks}
                         </div>
-                        <span className="text-[10px] uppercase tracking-wider text-neutral-500 block">
-                          Klik Checkout
+                        <span className="text-[11px] font-medium text-[#4A4D52] block">
+                          Klik Keluar
                         </span>
                       </div>
                     ))}
-                  </div>
-
-                  <div className="p-3 bg-[#555D47]/10 text-xs text-neutral-700 leading-relaxed border border-[#555D47]/20 mt-4">
-                    <strong>Catatan Real-time:</strong> Setiap kali pembeli mengklik tombol Shopee, WhatsApp, atau TikTok di modal checkout produk, counter di atas bertambah secara instan.
                   </div>
                 </div>
               </div>
 
               {/* Row 3: Popular Products & Pages */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                {/* Top Products (7 cols) */}
-                <div className="lg:col-span-7 bg-white border border-[#E2E2DC] p-6 space-y-4">
-                  <h3 className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#141517] pb-3 border-b border-[#E2E2DC]">
-                    Artikel Produk Paling Banyak Dilihat (Top Views)
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8">
+                <div className="lg:col-span-7 bg-white border border-[#DCDCD4] p-5 sm:p-6 space-y-4">
+                  <h3 className="text-xs font-extrabold uppercase tracking-[0.14em] text-[#141517] pb-3 border-b border-[#DCDCD4]">
+                    Produk yang Paling Sering Dilihat
                   </h3>
-                  <div className="space-y-3 pt-1">
+                  <div className="space-y-2.5 pt-1">
                     {analytics.popularProducts.length === 0 ? (
-                      <p className="text-xs text-neutral-500 italic py-4 text-center">
-                        Belum ada halaman produk yang dikunjungi. Kunjungan baru akan otomatis terdaftar di sini.
+                      <p className="text-xs text-[#4A4D52] py-4 text-center">
+                        Belum ada halaman detail produk yang tercatat. Buka salah satu halaman produk untuk melihat statistiknya.
                       </p>
                     ) : (
                       analytics.popularProducts.map((prod, idx) => (
                         <div
                           key={prod.slug}
-                          className="flex items-center justify-between p-3 bg-[#F7F7F4] border border-[#E2E2DC] hover:border-[#141517] transition-colors"
+                          className="flex items-center justify-between p-3 bg-[#F7F7F4] border border-[#DCDCD4]"
                         >
-                          <div className="flex items-center gap-3">
-                            <span className="w-5 h-5 bg-[#141517] text-white text-[10px] font-mono font-bold flex items-center justify-center shrink-0">
+                          <div className="flex items-center gap-3 min-w-0">
+                            <span className="w-6 h-6 bg-[#141517] text-white text-xs font-mono font-bold flex items-center justify-center shrink-0">
                               {idx + 1}
                             </span>
-                            <div>
-                              <h4 className="text-xs font-bold text-[#141517]">
+                            <div className="min-w-0">
+                              <h4 className="text-xs font-extrabold text-[#141517] truncate">
                                 {prod.name}
                               </h4>
                               <Link
                                 href={`/product/${prod.slug}`}
-                                className="text-[10px] text-neutral-500 hover:underline"
+                                className="text-[11px] text-[#1D2B4D] hover:underline truncate block"
                               >
                                 /product/{prod.slug}
                               </Link>
                             </div>
                           </div>
-                          <span className="text-xs font-black text-[#555D47]">
-                            {prod.views} views
+                          <span className="text-xs font-black text-[#3F4734] tabular-nums shrink-0 ml-2">
+                            {prod.views} tayangan
                           </span>
                         </div>
                       ))
@@ -724,15 +922,14 @@ export default function StudioPage() {
                   </div>
                 </div>
 
-                {/* Top Pages (5 cols) */}
-                <div className="lg:col-span-5 bg-white border border-[#E2E2DC] p-6 space-y-4">
-                  <h3 className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#141517] pb-3 border-b border-[#E2E2DC]">
+                <div className="lg:col-span-5 bg-white border border-[#DCDCD4] p-5 sm:p-6 space-y-4">
+                  <h3 className="text-xs font-extrabold uppercase tracking-[0.14em] text-[#141517] pb-3 border-b border-[#DCDCD4]">
                     Halaman Teratas
                   </h3>
                   <div className="space-y-2.5 pt-1">
                     {analytics.popularPages.length === 0 ? (
-                      <p className="text-xs text-neutral-500 italic py-4 text-center">
-                        Belum ada data kunjungan halaman.
+                      <p className="text-xs text-[#4A4D52] py-4 text-center">
+                        Belum ada riwayat halaman yang tercatat.
                       </p>
                     ) : (
                       analytics.popularPages.map((page) => (
@@ -741,14 +938,14 @@ export default function StudioPage() {
                           className="flex items-center justify-between py-2 border-b border-[#EFEFEA] text-xs"
                         >
                           <div>
-                            <span className="font-semibold text-[#141517] block">
+                            <span className="font-bold text-[#141517] block">
                               {page.label}
                             </span>
-                            <span className="text-[10px] font-mono text-neutral-400">
+                            <span className="text-[11px] font-mono text-[#4A4D52]">
                               {page.path}
                             </span>
                           </div>
-                          <span className="font-bold text-neutral-700 font-mono">
+                          <span className="font-extrabold text-[#141517] font-mono tabular-nums">
                             {page.views}
                           </span>
                         </div>
@@ -758,50 +955,73 @@ export default function StudioPage() {
                 </div>
               </div>
             </>
-          )}
+          ) : null}
         </div>
       )}
 
-      {/* Modal Tambah Produk Baru */}
       {showAddModal && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="add-product-modal-title"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75"
           onClick={() => setShowAddModal(false)}
         >
           <div
-            className="w-full max-w-lg bg-white border border-[#141517] p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto"
+            className="w-full max-w-lg bg-white border-2 border-[#141517] p-5 sm:p-6 shadow-2xl space-y-4 max-h-[90dvh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-sm font-extrabold uppercase tracking-[0.15em] text-[#141517] pb-3 border-b border-[#E2E2DC]">
-              Tambah Produk Baru Geesthart
-            </h3>
+            <div className="flex items-center justify-between pb-3 border-b border-[#DCDCD4]">
+              <h3
+                id="add-product-modal-title"
+                className="text-sm font-extrabold uppercase tracking-[0.14em] text-[#141517]"
+              >
+                Tambah Artikel Baru Geesthart
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowAddModal(false)}
+                aria-label="Tutup modal tambah produk"
+                className="min-w-[44px] min-h-[44px] -mr-2 inline-flex items-center justify-center text-[#4A4D52] hover:text-[#141517]"
+              >
+                <X className="w-5 h-5" aria-hidden="true" />
+              </button>
+            </div>
 
-            <form onSubmit={handleAddProduct} className="space-y-3.5 text-xs">
+            <form onSubmit={handleAddProduct} className="space-y-4 text-xs">
               <div>
-                <label className="block font-bold uppercase tracking-wider mb-1">
+                <label
+                  htmlFor="new-prod-name"
+                  className="block font-bold uppercase tracking-wider text-[#141517] mb-1"
+                >
                   Nama Produk *
                 </label>
                 <input
+                  id="new-prod-name"
                   type="text"
                   required
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
                   placeholder="Contoh: Fieldlite Windbreaker Jacket"
-                  className="w-full px-3 py-2 bg-[#F7F7F4] border border-[#D5D5CE]"
+                  className="min-h-[44px] w-full px-3.5 py-2 bg-[#F7F7F4] border border-[#C8C8C0] text-[#141517]"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold uppercase tracking-wider mb-1">
+                  <label
+                    htmlFor="new-prod-collection"
+                    className="block font-bold uppercase tracking-wider text-[#141517] mb-1"
+                  >
                     Seri Koleksi
                   </label>
                   <select
+                    id="new-prod-collection"
                     value={newCollection}
                     onChange={(e) =>
                       setNewCollection(e.target.value as ProductCollection)
                     }
-                    className="w-full px-3 py-2 bg-[#F7F7F4] border border-[#D5D5CE]"
+                    className="min-h-[44px] w-full px-3 py-2 bg-[#F7F7F4] border border-[#C8C8C0] text-[#141517] font-semibold"
                   >
                     <option value="Nimble X">Nimble X</option>
                     <option value="Litefield">Litefield</option>
@@ -810,15 +1030,19 @@ export default function StudioPage() {
                 </div>
 
                 <div>
-                  <label className="block font-bold uppercase tracking-wider mb-1">
-                    Kategori (Otomatis Size Chart)
+                  <label
+                    htmlFor="new-prod-category"
+                    className="block font-bold uppercase tracking-wider text-[#141517] mb-1"
+                  >
+                    Kategori (Menentukan Size Chart)
                   </label>
                   <select
+                    id="new-prod-category"
                     value={newCategory}
                     onChange={(e) =>
                       setNewCategory(e.target.value as ProductCategory)
                     }
-                    className="w-full px-3 py-2 bg-[#F7F7F4] border border-[#D5D5CE]"
+                    className="min-h-[44px] w-full px-3 py-2 bg-[#F7F7F4] border border-[#C8C8C0] text-[#141517] font-semibold"
                   >
                     <option value="jaket">Jaket</option>
                     <option value="celana-panjang">Celana Panjang</option>
@@ -827,15 +1051,19 @@ export default function StudioPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                  <label className="block font-bold uppercase tracking-wider mb-1">
-                    Gender
+                  <label
+                    htmlFor="new-prod-gender"
+                    className="block font-bold uppercase tracking-wider text-[#141517] mb-1"
+                  >
+                    Tipe Pemakai
                   </label>
                   <select
+                    id="new-prod-gender"
                     value={newGender}
                     onChange={(e) => setNewGender(e.target.value as ProductGender)}
-                    className="w-full px-3 py-2 bg-[#F7F7F4] border border-[#D5D5CE]"
+                    className="min-h-[44px] w-full px-3 py-2 bg-[#F7F7F4] border border-[#C8C8C0] text-[#141517] font-semibold"
                   >
                     <option value="unisex">Unisex</option>
                     <option value="wanita">Wanita</option>
@@ -843,26 +1071,34 @@ export default function StudioPage() {
                 </div>
 
                 <div>
-                  <label className="block font-bold uppercase tracking-wider mb-1">
-                    Harga (Rp)
+                  <label
+                    htmlFor="new-prod-price"
+                    className="block font-bold uppercase tracking-wider text-[#141517] mb-1"
+                  >
+                    Harga (Rp) *
                   </label>
                   <input
+                    id="new-prod-price"
                     type="number"
                     required
                     value={newPrice}
                     onChange={(e) => setNewPrice(Number(e.target.value) || 0)}
-                    className="w-full px-3 py-2 bg-[#F7F7F4] border border-[#D5D5CE]"
+                    className="min-h-[44px] w-full px-3 py-2 bg-[#F7F7F4] border border-[#C8C8C0] text-[#141517] font-bold tabular-nums"
                   />
                 </div>
 
                 <div>
-                  <label className="block font-bold uppercase tracking-wider mb-1">
+                  <label
+                    htmlFor="new-prod-status"
+                    className="block font-bold uppercase tracking-wider text-[#141517] mb-1"
+                  >
                     Status Stok
                   </label>
                   <select
+                    id="new-prod-status"
                     value={newStatus}
                     onChange={(e) => setNewStatus(e.target.value as ProductStatus)}
-                    className="w-full px-3 py-2 bg-[#F7F7F4] border border-[#D5D5CE]"
+                    className="min-h-[44px] w-full px-3 py-2 bg-[#F7F7F4] border border-[#C8C8C0] text-[#141517] font-semibold"
                   >
                     <option value="tersedia">Tersedia</option>
                     <option value="segera-hadir">Segera Hadir</option>
@@ -872,84 +1108,100 @@ export default function StudioPage() {
               </div>
 
               <div>
-                <label className="block font-bold uppercase tracking-wider mb-1">
-                  Pilih Foto Produk (Dari Aset atau URL)
+                <label
+                  htmlFor="new-prod-image"
+                  className="block font-bold uppercase tracking-wider text-[#141517] mb-1"
+                >
+                  Pilih Foto Produk
                 </label>
                 <select
+                  id="new-prod-image"
                   value={newImage}
                   onChange={(e) => setNewImage(e.target.value)}
-                  className="w-full px-3 py-2 bg-[#F7F7F4] border border-[#D5D5CE]"
+                  className="min-h-[44px] w-full px-3 py-2 bg-[#F7F7F4] border border-[#C8C8C0] text-[#141517] font-semibold"
                 >
                   <option value="/images/products/nimble-x-jacket-black.jpg">
-                    Nimble X Jacket — Black
+                    Nimble X Jacket (Black)
                   </option>
                   <option value="/images/products/nimble-x-jacket-green-olive.jpg">
-                    Nimble X Jacket — Green Olive
+                    Nimble X Jacket (Green Olive)
                   </option>
                   <option value="/images/products/nimble-x-jacket-blue-oxford.jpg">
-                    Nimble X Jacket — Blue Oxford
+                    Nimble X Jacket (Blue Oxford)
                   </option>
                   <option value="/images/products/litefield-pants-black-1.jpg">
-                    Litefield Trackpants — Black
+                    Litefield Trackpants (Black)
                   </option>
                   <option value="/images/products/litefield-pants-olive-1.jpg">
-                    Litefield Trackpants — Green Olive
+                    Litefield Trackpants (Green Olive)
                   </option>
                   <option value="/images/products/litefield-skort-pink-1.jpeg">
-                    Litefield Skort — Pink
+                    Litefield Skort (Pink)
                   </option>
                 </select>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold uppercase tracking-wider mb-1">
+                  <label
+                    htmlFor="new-prod-color-name"
+                    className="block font-bold uppercase tracking-wider text-[#141517] mb-1"
+                  >
                     Nama Warna Utama
                   </label>
                   <input
+                    id="new-prod-color-name"
                     type="text"
                     value={newColorName}
                     onChange={(e) => setNewColorName(e.target.value)}
-                    className="w-full px-3 py-2 bg-[#F7F7F4] border border-[#D5D5CE]"
+                    className="min-h-[44px] w-full px-3 py-2 bg-[#F7F7F4] border border-[#C8C8C0] text-[#141517]"
                   />
                 </div>
                 <div>
-                  <label className="block font-bold uppercase tracking-wider mb-1">
-                    Warna Swatch
+                  <label
+                    htmlFor="new-prod-color-hex"
+                    className="block font-bold uppercase tracking-wider text-[#141517] mb-1"
+                  >
+                    Kode Warna Swatch
                   </label>
                   <input
+                    id="new-prod-color-hex"
                     type="color"
                     value={newColorHex}
                     onChange={(e) => setNewColorHex(e.target.value)}
-                    className="w-full h-9 bg-[#F7F7F4] border border-[#D5D5CE] p-1"
+                    className="min-h-[44px] w-full bg-[#F7F7F4] border border-[#C8C8C0] p-1"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block font-bold uppercase tracking-wider mb-1">
+                <label
+                  htmlFor="new-prod-desc"
+                  className="block font-bold uppercase tracking-wider text-[#141517] mb-1"
+                >
                   Deskripsi Singkat
                 </label>
                 <textarea
+                  id="new-prod-desc"
                   rows={2}
                   value={newShortDesc}
                   onChange={(e) => setNewShortDesc(e.target.value)}
-                  placeholder="Deskripsi singkat produk..."
-                  className="w-full px-3 py-2 bg-[#F7F7F4] border border-[#D5D5CE]"
+                  placeholder="Tuliskan deskripsi bahan dan potongan produk..."
+                  className="w-full p-3 bg-[#F7F7F4] border border-[#C8C8C0] text-[#141517]"
                 />
               </div>
 
-              <div className="pt-3 flex items-center justify-end gap-2">
+              <div className="pt-3 flex items-center justify-end gap-2.5">
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 border border-[#D5D5CE] text-neutral-700 font-bold uppercase"
+                  className="min-h-[44px] px-4 py-2 border border-[#141517] text-[#141517] font-bold uppercase tracking-wider"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-[#141517] text-white font-bold uppercase"
+                  className="min-h-[44px] px-5 py-2 bg-[#141517] hover:bg-[#3F4734] text-white font-extrabold uppercase tracking-wider"
                 >
                   Simpan &amp; Publikasikan
                 </button>

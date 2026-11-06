@@ -8,11 +8,11 @@ import { AnalyticsTracker } from '@/components/AnalyticsTracker';
 
 export const metadata: Metadata = {
   title: {
-    default: 'GEESTHART — Own Your Path | Streetwear & Outdoor Bandung',
+    default: 'GEESTHART | Own Your Path: Pakaian Outdoor & Streetwear Bandung',
     template: '%s | GEESTHART BANDUNG',
   },
   description:
-    'Brand streetwear dan outdoor dari Bandung sejak 2024. Jelajahi koleksi Fieldcore Jacket Nimble X, Litefield Trackpants, dan Active Skort.',
+    'Brand pakaian outdoor dan streetwear asal Bandung sejak 2024. Lihat katalog resmi Fieldcore Jacket Nimble X, Litefield Trackpants, dan Active Skort lengkap dengan panduan ukuran.',
   keywords: [
     'Geesthart',
     'Geesthart Bandung',
@@ -24,9 +24,9 @@ export const metadata: Metadata = {
     'Litefield Skort',
   ],
   openGraph: {
-    title: 'GEESTHART — Own Your Path | Streetwear & Outdoor Bandung',
+    title: 'GEESTHART | Own Your Path: Pakaian Outdoor & Streetwear Bandung',
     description:
-      'Dua dunia dalam satu identitas: dari kanopi hutan pinus hingga jalanan kota Bandung. Lihat katalog resmi & size chart Geesthart.',
+      'Dirancang di Bandung untuk kanopi hutan pinus hingga jalanan kota. Bandingkan tabel ukuran resmi dan pesan lewat Shopee, TikTok Shop, atau WhatsApp.',
     type: 'website',
     locale: 'id_ID',
   },
@@ -39,10 +39,18 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id">
-      <body className="min-h-screen flex flex-col font-sans antialiased selection:bg-[#555D47] selection:text-white">
+      <body className="min-h-screen flex flex-col font-sans antialiased selection:bg-[#3F4734] selection:text-white">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:px-4 focus:py-2.5 focus:bg-[#141517] focus:text-white focus:text-xs focus:font-bold focus:uppercase focus:tracking-wider"
+        >
+          Lewati ke konten utama
+        </a>
         <AnalyticsTracker />
         <Navbar />
-        <main className="flex-1">{children}</main>
+        <main id="main-content" className="flex-1">
+          {children}
+        </main>
         <Footer />
         <Analytics />
         <SpeedInsights />
